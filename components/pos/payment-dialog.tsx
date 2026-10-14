@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircle, Loader2, Lock, X } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -13,13 +13,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { useMpesaPayment } from "@/hooks/use-mpesa-payment";
 import { centsToInput, formatKsh, parseCents } from "@/lib/pos/money";
 import type { PaymentEntry } from "@/lib/pos/types";
 import { MpesaPane } from "./mpesa-pane";
+import { InputGroup, InputGroupInput } from "../ui/input-group";
 
-type Method = "CASH" | "CARD" | "MPESA";
+type Method = "CASH" | "MPESA" | "CARD";
 type Draft = Omit<PaymentEntry, "id">;
 
 const LABEL: Record<Method, string> = {
@@ -27,6 +27,8 @@ const LABEL: Record<Method, string> = {
   CARD: "Card",
   MPESA: "M-Pesa",
 };
+
+const METHODS = Object.keys(LABEL) as Method[];
 
 type Props = {
   open: boolean;
@@ -108,62 +110,6 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
   // While a request is in flight or its money is in hand, the dialog cannot be dismissed
   const locked = hasMpesaEntry || mpesaBusy;
 
-  // Single place that changes the entry list, so the ref, the state and the
-  // prefilled amounts can never drift apart.
-  function applyEntries(next: PaymentEntry[]) {
-    entriesRef.current = next;
-    setEntries(next);
-    const left = Math.max(totalCents - totalPaid(next), 0);
-    setCash(centsToInput(left));
-    setCardAmount(centsToInput(left));
-  }
-
-  // Focus the cash field whenever it is the active input
-  useEffect(() => {
-    if (!open || method !== "CASH" || fullyPaid) return;
-    const t = setTimeout(() => {
-      cashRef.current?.focus();
-      cashRef.current?.select();
-    }, 60);
-    return () => clearTimeout(t);
-  }, [open, method, remaining, fullyPaid]);
-
-  // Refreshing or closing the tab while money is in flight would lose track of it: ask first
-  useEffect(() => {
-    if (!locked) return;
-    const warn = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = ""; // required by Safari and older browsers
-    };
-    window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, [locked]);
-
-  // A stray earlier tap must not leave "Tap again to leave" armed forever
-  useEffect(() => {
-    if (!confirmLeave) return;
-    const t = setTimeout(() => setConfirmLeave(false), 4000);
-    return () => clearTimeout(t);
-  }, [confirmLeave]);
-
-  // The customer approved on their phone: record it and, if it covers the bill, finish the sale
-  useEffect(() => {
-    const s = mpesa.state;
-    if (s.phase !== "paid" || handledPaid.current === s.id) return;
-    handledPaid.current = s.id;
-    const entry: PaymentEntry = {
-      id: String(nextId.current++),
-      method: "MPESA",
-      amountCents: s.amountCents,
-      reference: s.receipt ?? undefined,
-      mpesaPaymentId: s.id,
-    };
-    mpesa.reset();
-    void commit(entry);
-    // `commit` only reads refs and props from this render; handledPaid makes this run once per payment
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mpesa.state]);
-
   const draft = useMemo((): {
     entry?: Draft;
     change?: number;
@@ -206,34 +152,59 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
 
   const covers = draft.entry ? draft.entry.amountCents >= remaining : false;
 
-  async function submitAll(all: PaymentEntry[]) {
-    // A ref, not state: two triggers in the same tick must not both get through
-    if (submittingRef.current) return;
-    submittingRef.current = true;
-    setSubmitting(true);
-    setError(null);
-    saleKey.current ??= newKey();
-    try {
-      await onSubmit(all, saleKey.current);
-      // Sale is done. If the parent keeps this dialog open, the next sale gets a new key.
-      saleKey.current = null;
-      applyEntries([]);
-      mpesa.reset();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not complete the sale");
-    } finally {
-      submittingRef.current = false;
-      setSubmitting(false);
-    }
-  }
+  // ---------------------------------------------------------------------------
+  // Actions. These are declared BEFORE any effect that calls them.
+  // ---------------------------------------------------------------------------
+
+  // Single place that changes the entry list, so the ref, the state and the
+  // prefilled amounts can never drift apart.
+  const applyEntries = useCallback(
+    (next: PaymentEntry[]) => {
+      entriesRef.current = next;
+      setEntries(next);
+      const left = Math.max(totalCents - totalPaid(next), 0);
+      setCash(centsToInput(left));
+      setCardAmount(centsToInput(left));
+    },
+    [totalCents],
+  );
+
+  const submitAll = useCallback(
+    async (all: PaymentEntry[]) => {
+      // A ref, not state: two triggers in the same tick must not both get through
+      if (submittingRef.current) return;
+      submittingRef.current = true;
+      setSubmitting(true);
+      setError(null);
+      saleKey.current ??= newKey();
+      try {
+        await onSubmit(all, saleKey.current);
+        // Sale is done. If the parent keeps this dialog open, the next sale gets a new key.
+        saleKey.current = null;
+        applyEntries([]);
+        mpesa.reset();
+      } catch (e) {
+        setError(
+          e instanceof Error ? e.message : "Could not complete the sale",
+        );
+      } finally {
+        submittingRef.current = false;
+        setSubmitting(false);
+      }
+    },
+    [applyEntries, mpesa, onSubmit],
+  );
 
   // Entries are stored before submitting, so a failed submit can simply be retried
-  async function commit(entry: PaymentEntry) {
-    const all = [...entriesRef.current, entry];
-    applyEntries(all);
-    setReference("");
-    if (totalPaid(all) >= totalCents) await submitAll(all);
-  }
+  const commit = useCallback(
+    async (entry: PaymentEntry) => {
+      const all = [...entriesRef.current, entry];
+      applyEntries(all);
+      setReference("");
+      if (totalPaid(all) >= totalCents) await submitAll(all);
+    },
+    [applyEntries, submitAll, totalCents],
+  );
 
   function charge() {
     if (!draft.entry || submittingRef.current) return;
@@ -252,6 +223,56 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
     mpesa.reset();
     onOpenChange(false);
   }
+
+  // ---------------------------------------------------------------------------
+  // Effects
+  // ---------------------------------------------------------------------------
+
+  // The customer approved on their phone: record it and, if it covers the bill,
+  // finish the sale. Runs after `commit` is declared, and `handledPaid` makes
+  // sure each payment is recorded exactly once even if this effect re-runs.
+  useEffect(() => {
+    const s = mpesa.state;
+    if (s.phase !== "paid" || handledPaid.current === s.id) return;
+    handledPaid.current = s.id;
+    const entry: PaymentEntry = {
+      id: String(nextId.current++),
+      method: "MPESA",
+      amountCents: s.amountCents,
+      reference: s.receipt ?? undefined,
+      mpesaPaymentId: s.id,
+    };
+    mpesa.reset();
+    void commit(entry);
+  }, [mpesa, commit]);
+
+  // Focus the cash field whenever it is the active input
+  useEffect(() => {
+    if (!open || method !== "CASH" || fullyPaid) return;
+    const t = setTimeout(() => {
+      cashRef.current?.focus();
+      cashRef.current?.select();
+    }, 60);
+    return () => clearTimeout(t);
+  }, [open, method, remaining, fullyPaid]);
+
+  // Refreshing or closing the tab while money is in flight would lose track of it: ask first
+  useEffect(() => {
+    if (!locked) return;
+    const warn = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = ""; // required by Safari and older browsers
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [locked]);
+
+  // A stray earlier tap must not leave "Tap again to leave" armed forever
+  useEffect(() => {
+    if (!confirmLeave) return;
+    const t = setTimeout(() => setConfirmLeave(false), 4000);
+    return () => clearTimeout(t);
+  }, [confirmLeave]);
 
   return (
     <Dialog
@@ -331,7 +352,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
               aria-label="Payment method"
               className="grid grid-cols-3 gap-2"
             >
-              {(Object.keys(LABEL) as Method[]).map((m) => (
+              {METHODS.map((m) => (
                 <Button
                   key={m}
                   type="button"
@@ -366,15 +387,17 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                       <FieldLabel htmlFor="cash">
                         Cash received (KSh)
                       </FieldLabel>
-                      <Input
-                        id="cash"
-                        ref={cashRef}
-                        inputMode="decimal"
-                        autoComplete="off"
-                        value={cash}
-                        onChange={(e) => setCash(e.target.value)}
-                        className="h-12 text-lg"
-                      />
+                      <InputGroup className="h-11">
+                        <InputGroupInput
+                          id="cash"
+                          ref={cashRef}
+                          inputMode="decimal"
+                          autoComplete="off"
+                          value={cash}
+                          onChange={(e) => setCash(e.target.value)}
+                          className="h-12 text-lg"
+                        />
+                      </InputGroup>
                     </Field>
                     <div className="flex flex-wrap gap-2">
                       {quickAmounts(remaining).map((c) => (
@@ -397,7 +420,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                   </>
                 ) : (
                   <>
-                    <Field>
+                    {/* <Field>
                       <FieldLabel htmlFor="card-amount">
                         Amount (KSh)
                       </FieldLabel>
@@ -421,7 +444,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                         onChange={(e) => setReference(e.target.value)}
                         className="h-12"
                       />
-                    </Field>
+                    </Field> */}
                   </>
                 )}
               </form>

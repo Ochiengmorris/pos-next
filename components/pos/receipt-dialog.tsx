@@ -88,7 +88,7 @@ export function ReceiptBody({ r }: { r: Receipt }) {
       {toCents(r.changeDue) > 0 && (
         <Row left="Change" right={money(r.changeDue)} bold />
       )}
-      <p className="mt-3 text-center">Thank you for shopping with us!</p>
+      {r.store.footer && <p className="mt-3 text-center">{r.store.footer}</p>}
     </div>
   );
 }

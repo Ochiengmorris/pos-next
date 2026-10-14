@@ -1,8 +1,12 @@
-import { PageHeader } from "@/components/app/page-header";
+// import { SettingsForm } from "@/components/settings/settings-form";
 import { rolesFor } from "@/lib/access";
+import { api } from "@/lib/api.server";
+import type { StoreSettings } from "@/lib/settings/types";
 import { requireSession } from "@/lib/session";
+import { SettingsForm } from "@/lib/settings/settings-form";
 
-export default async function Page() {
+export default async function SettingsPage() {
   await requireSession(rolesFor("/settings"));
-  return <PageHeader title="Settings" description="Coming in a later step." />;
+  const store = await api<StoreSettings>("/settings/store");
+  return <SettingsForm initial={store} />;
 }

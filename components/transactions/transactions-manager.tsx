@@ -96,7 +96,7 @@ export function TransactionsManager({
     setLoading(true);
     (async () => {
       try {
-        const qs = new URLSearchParams({ page: String(page), limit: "10" });
+        const qs = new URLSearchParams({ page: String(page), limit: "9" });
         if (debouncedReceipt.trim()) qs.set("receipt", debouncedReceipt.trim());
         if (status !== "all") qs.set("status", status);
         if (from) qs.set("from", startOfDayISO(from));

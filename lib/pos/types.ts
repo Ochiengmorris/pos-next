@@ -44,7 +44,13 @@ export type PaymentEntry = {
 
 export type Receipt = {
   status: "COMPLETED" | "VOIDED" | "REFUNDED";
-  store: { name: string; address: string; phone: string; taxPin: string };
+  store: {
+    name: string;
+    address: string;
+    phone: string;
+    taxPin: string;
+    footer: string;
+  };
   receiptNo: string;
   date: string;
   cashier: string;
