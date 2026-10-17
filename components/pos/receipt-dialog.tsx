@@ -34,7 +34,7 @@ function Row({
   return (
     <div className={`flex justify-between gap-3 ${bold ? "font-bold" : ""}`}>
       <span>{left}</span>
-      <span className="tabular-nums">{right}</span>
+      <span className="whitespace-nowrap tabular-nums">{right}</span>
     </div>
   );
 }
@@ -79,11 +79,12 @@ export function ReceiptBody({ r }: { r: Receipt }) {
       <Row left="TOTAL" right={money(r.total)} bold />
       <hr className="my-2 border-dashed border-black" />
       {r.payments.map((p, n) => (
-        <Row
-          key={n}
-          left={`${METHOD[p.method] ?? p.method}${p.reference ? ` (${p.reference})` : ""}`}
-          right={money(p.amount)}
-        />
+        <div key={n}>
+          <Row
+            left={`${METHOD[p.method] ?? p.method}${p.reference ? ` (Ref:${p.reference})` : ""}`}
+            right={money(p.amount)}
+          />
+        </div>
       ))}
       {toCents(r.changeDue) > 0 && (
         <Row left="Change" right={money(r.changeDue)} bold />

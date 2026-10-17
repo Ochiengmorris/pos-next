@@ -16,6 +16,14 @@ export const proxy = auth((req) => {
     return NextResponse.redirect(url);
   }
 
+  // a temporary password must be replaced before anything else
+  if (
+    session.user.mustChangePassword &&
+    !pathname.startsWith("/change-password")
+  ) {
+    return NextResponse.redirect(new URL("/change-password", req.url));
+  }
+
   // already signed in: skip the login page
   if (pathname.startsWith("/login")) {
     return NextResponse.redirect(new URL(homeFor(session.user.role), req.url));

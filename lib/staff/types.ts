@@ -7,6 +7,7 @@ export type StaffUser = {
   role: StaffRole;
   isActive: boolean;
   createdAt: string;
+  mustChangePassword: string;
 };
 
 export type StaffPage = {

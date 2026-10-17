@@ -141,7 +141,7 @@ export function StaffManager({
   const { items, meta } = data;
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-6">
+    <div className="mx-auto grid max-w-7xl gap-6">
       <PageHeader
         title="Staff"
         description="Who can sign in, and what they can do."
@@ -266,7 +266,7 @@ export function StaffManager({
                         {ROLE_LABEL[u.role]}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="flex gap-2">
                       {u.isActive ? (
                         <Badge
                           variant="secondary"
@@ -276,6 +276,11 @@ export function StaffManager({
                         </Badge>
                       ) : (
                         <Badge variant="destructive">Deactivated</Badge>
+                      )}
+                      {u.isActive && u.mustChangePassword && (
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          Must change password
+                        </div>
                       )}
                     </TableCell>
                     <TableCell className="hidden whitespace-nowrap text-muted-foreground lg:table-cell">

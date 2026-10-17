@@ -87,8 +87,8 @@ export function MpesaPane({
 
         {elapsed >= 45 && (
           <p className="text-sm">
-            Taking longer than usual. If the customer says they have paid, tap
-            “Check now”.
+            Taking longer than usual. The customer can still approve it. If they
+            say they have paid, tap “Check now”.
           </p>
         )}
 

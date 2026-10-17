@@ -45,3 +45,8 @@ export async function request<T>(
   }
   return body as T;
 }
+
+export const needsPasswordChange = (e: unknown) =>
+  e instanceof ApiError &&
+  e.status === 403 &&
+  (e.body as { code?: string } | null)?.code === "PASSWORD_CHANGE_REQUIRED";

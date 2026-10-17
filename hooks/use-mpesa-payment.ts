@@ -44,7 +44,8 @@ function toState(
       return {
         phase: "failed",
         reason: "TIMEOUT",
-        message: "The customer didn't respond in time.",
+        message:
+          "No confirmation received. If the customer says they paid, don't charge again: check your M-Pesa statement or ask a manager to look under Unclaimed payments.",
       };
     default:
       return {

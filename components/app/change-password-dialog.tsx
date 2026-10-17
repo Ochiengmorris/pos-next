@@ -3,6 +3,7 @@
 import { type FormEvent, useState } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { PasswordInput } from "@/components/staff/password-tools";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +19,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { PasswordInput } from "@/components/staff/password-tools";
 import { ApiError } from "@/lib/api";
 import { useApi } from "@/lib/use-api";
 
@@ -38,13 +38,22 @@ export function ChangePasswordDialog({
             Use at least 8 characters. You stay signed in.
           </DialogDescription>
         </DialogHeader>
-        <ChangeForm onDone={() => onOpenChange(false)} />
+        <ChangePasswordForm
+          onDone={() => onOpenChange(false)}
+          onCancel={() => onOpenChange(false)}
+        />
       </DialogContent>
     </Dialog>
   );
 }
 
-function ChangeForm({ onDone }: { onDone: () => void }) {
+export function ChangePasswordForm({
+  onDone,
+  onCancel,
+}: {
+  onDone: () => void | Promise<void>;
+  onCancel?: () => void;
+}) {
   const call = useApi();
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
@@ -75,7 +84,7 @@ function ChangeForm({ onDone }: { onDone: () => void }) {
         body: JSON.stringify({ currentPassword: current, newPassword: next }),
       });
       toast.success("Password changed");
-      onDone();
+      await onDone();
     } catch (err) {
       if (
         err instanceof ApiError &&
@@ -132,15 +141,17 @@ function ChangeForm({ onDone }: { onDone: () => void }) {
           {errors.confirm && <FieldError>{errors.confirm}</FieldError>}
         </Field>
         <div className="flex justify-end gap-2 pt-2">
-          <Button
-            type="button"
-            variant="outline"
-            className="h-11"
-            disabled={submitting}
-            onClick={onDone}
-          >
-            Cancel
-          </Button>
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11"
+              disabled={submitting}
+              onClick={onCancel}
+            >
+              Cancel
+            </Button>
+          )}
           <Button
             type="submit"
             className="h-11 min-w-36"

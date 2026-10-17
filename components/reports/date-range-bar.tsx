@@ -8,6 +8,7 @@ import {
   type Preset,
   type Range,
 } from "@/lib/reports/range";
+import { DateRangePicker } from "../app/date-range-picker";
 
 export function DateRangeBar({
   preset,
@@ -44,7 +45,7 @@ export function DateRangeBar({
             </Button>
           ))}
         </div>
-        <label className="flex items-center gap-2 text-sm">
+        {/* <label className="flex items-center gap-2 text-sm">
           From
           <Input
             type="date"
@@ -66,6 +67,16 @@ export function DateRangeBar({
               e.target.value && onCustom({ ...range, to: e.target.value })
             }
             className="h-11 w-40 bg-card"
+          />
+        </label> */}
+
+        <label htmlFor="date">
+          <DateRangePicker
+            from={range.from}
+            to={range.to}
+            onChange={({ from, to }) => {
+              onCustom({ ...range, to: to, from: from });
+            }}
           />
         </label>
       </div>

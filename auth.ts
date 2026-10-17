@@ -9,6 +9,7 @@ type AuthToken = {
   accessToken?: string;
   accessTokenExpires?: number;
   error?: "AccessTokenExpired";
+  mustChangePassword?: boolean;
 };
 // Custom codes reach the login page so it can show a specific message
 class TooManyAttempts extends CredentialsSignin {
@@ -64,12 +65,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: data.user.role,
           accessToken: data.accessToken,
           accessTokenExpires: jwtExpiryMs(data.accessToken),
+          mustChangePassword: data.user.mustChangePassword,
         };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       const jwtToken = token as AuthToken;
 
       if (user) {
@@ -80,7 +82,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           accessToken: user.accessToken,
           accessTokenExpires: user.accessTokenExpires,
+          mustChangePassword: user.mustChangePassword,
         };
+      }
+
+      // the change-password page reports success. The API is the real gate; this only updates the cookie.
+      if (trigger === "update" && session?.mustChangePassword === false) {
+        return { ...jwtToken, mustChangePassword: false };
       }
 
       // backend token expired (30s margin): flag it; there are no refresh tokens
@@ -94,6 +102,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // always set at sign-in by the jwt callback above
       session.user.id = t.id!;
       session.user.role = t.role!;
+      session.user.mustChangePassword = t.mustChangePassword;
       session.accessToken = t.accessToken!;
       session.error = t.error;
       return session;

@@ -105,151 +105,153 @@ export function SettingsForm({ initial }: { initial: StoreSettings }) {
   };
 
   return (
-    <div className="mx-auto grid max-w-5xl gap-6">
-      <PageHeader
-        title="Settings"
-        description="Your shop's details, printed on every receipt."
-      />
+    <div className="mx-auto w-full max-w-7xl">
+      <div className="grid max-w-5xl gap-6">
+        <PageHeader
+          title="Settings"
+          description="Your shop's details, printed on every receipt."
+        />
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_380px]">
-        <Card>
-          <CardHeader>
-            <CardTitle>Shop details</CardTitle>
-            <CardDescription>
-              Changes apply to every receipt from now on, including reprints of
-              older sales.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={submit} noValidate>
-              <FieldGroup>
-                {serverError && (
-                  <Alert variant="destructive">
-                    <AlertCircle aria-hidden />
-                    <AlertDescription>{serverError}</AlertDescription>
-                  </Alert>
-                )}
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_380px]">
+          <Card>
+            <CardHeader>
+              <CardTitle>Shop details</CardTitle>
+              <CardDescription>
+                Changes apply to every receipt from now on, including reprints
+                of older sales.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={submit} noValidate>
+                <FieldGroup>
+                  {serverError && (
+                    <Alert variant="destructive">
+                      <AlertCircle aria-hidden />
+                      <AlertDescription>{serverError}</AlertDescription>
+                    </Alert>
+                  )}
 
-                <Field data-invalid={!!nameError}>
-                  <FieldLabel htmlFor="s-name">Shop name</FieldLabel>
-                  <Input
-                    id="s-name"
-                    maxLength={80}
-                    autoComplete="off"
-                    className="h-11"
-                    value={v.name}
-                    onChange={(e) => set("name")(e.target.value)}
-                    aria-invalid={!!nameError}
-                  />
-                  {nameError && <FieldError>{nameError}</FieldError>}
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="s-address">Address</FieldLabel>
-                  <Input
-                    id="s-address"
-                    maxLength={200}
-                    autoComplete="off"
-                    className="h-11"
-                    value={v.address}
-                    onChange={(e) => set("address")(e.target.value)}
-                  />
-                </Field>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field>
-                    <FieldLabel htmlFor="s-phone">Phone</FieldLabel>
+                  <Field data-invalid={!!nameError}>
+                    <FieldLabel htmlFor="s-name">Shop name</FieldLabel>
                     <Input
-                      id="s-phone"
-                      type="tel"
-                      maxLength={30}
+                      id="s-name"
+                      maxLength={80}
                       autoComplete="off"
                       className="h-11"
-                      value={v.phone}
-                      onChange={(e) => set("phone")(e.target.value)}
+                      value={v.name}
+                      onChange={(e) => set("name")(e.target.value)}
+                      aria-invalid={!!nameError}
+                    />
+                    {nameError && <FieldError>{nameError}</FieldError>}
+                  </Field>
+
+                  <Field>
+                    <FieldLabel htmlFor="s-address">Address</FieldLabel>
+                    <Input
+                      id="s-address"
+                      maxLength={200}
+                      autoComplete="off"
+                      className="h-11"
+                      value={v.address}
+                      onChange={(e) => set("address")(e.target.value)}
                     />
                   </Field>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field>
+                      <FieldLabel htmlFor="s-phone">Phone</FieldLabel>
+                      <Input
+                        id="s-phone"
+                        type="tel"
+                        maxLength={30}
+                        autoComplete="off"
+                        className="h-11"
+                        value={v.phone}
+                        onChange={(e) => set("phone")(e.target.value)}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel htmlFor="s-pin">Tax PIN (KRA)</FieldLabel>
+                      <Input
+                        id="s-pin"
+                        maxLength={30}
+                        autoComplete="off"
+                        spellCheck={false}
+                        className="h-11 font-mono"
+                        value={v.taxPin}
+                        onChange={(e) =>
+                          set("taxPin")(e.target.value.toUpperCase())
+                        }
+                      />
+                      <FieldDescription>
+                        Printed on receipts. Leave blank to hide it.
+                      </FieldDescription>
+                    </Field>
+                  </div>
+
                   <Field>
-                    <FieldLabel htmlFor="s-pin">Tax PIN (KRA)</FieldLabel>
+                    <FieldLabel htmlFor="s-footer">Closing line</FieldLabel>
                     <Input
-                      id="s-pin"
-                      maxLength={30}
+                      id="s-footer"
+                      maxLength={120}
                       autoComplete="off"
-                      spellCheck={false}
-                      className="h-11 font-mono"
-                      value={v.taxPin}
-                      onChange={(e) =>
-                        set("taxPin")(e.target.value.toUpperCase())
-                      }
+                      className="h-11"
+                      value={v.receiptFooter}
+                      onChange={(e) => set("receiptFooter")(e.target.value)}
                     />
                     <FieldDescription>
-                      Printed on receipts. Leave blank to hide it.
+                      The last line on the receipt. Leave blank for none.
                     </FieldDescription>
                   </Field>
-                </div>
 
-                <Field>
-                  <FieldLabel htmlFor="s-footer">Closing line</FieldLabel>
-                  <Input
-                    id="s-footer"
-                    maxLength={120}
-                    autoComplete="off"
-                    className="h-11"
-                    value={v.receiptFooter}
-                    onChange={(e) => set("receiptFooter")(e.target.value)}
-                  />
-                  <FieldDescription>
-                    The last line on the receipt. Leave blank for none.
-                  </FieldDescription>
-                </Field>
-
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  {dirty && !submitting && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="h-11"
-                      onClick={() => {
-                        setV(saved);
-                        setNameError(null);
-                      }}
-                    >
-                      Discard changes
-                    </Button>
-                  )}
-                  <Button
-                    type="submit"
-                    className="h-11 min-w-32"
-                    disabled={!dirty || submitting}
-                    aria-busy={submitting}
-                  >
-                    {submitting && (
-                      <Loader2 className="animate-spin" aria-hidden />
+                  <div className="flex items-center justify-end gap-2 pt-2">
+                    {dirty && !submitting && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="h-11"
+                        onClick={() => {
+                          setV(saved);
+                          setNameError(null);
+                        }}
+                      >
+                        Discard changes
+                      </Button>
                     )}
-                    {submitting ? "Saving…" : "Save changes"}
-                  </Button>
-                </div>
-              </FieldGroup>
-            </form>
-          </CardContent>
-        </Card>
+                    <Button
+                      type="submit"
+                      className="h-11 min-w-32"
+                      disabled={!dirty || submitting}
+                      aria-busy={submitting}
+                    >
+                      {submitting && (
+                        <Loader2 className="animate-spin" aria-hidden />
+                      )}
+                      {submitting ? "Saving…" : "Save changes"}
+                    </Button>
+                  </div>
+                </FieldGroup>
+              </form>
+            </CardContent>
+          </Card>
 
-        <Card className="lg:sticky lg:top-24">
-          <CardHeader>
-            <CardTitle>Receipt preview</CardTitle>
-            <CardDescription>
-              Updates as you type. The items are samples.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div
-              className="rounded-lg border bg-white p-4"
-              aria-label="Receipt preview"
-            >
-              <ReceiptBody r={sample} />
-            </div>
-          </CardContent>
-        </Card>
+          <Card className="lg:sticky lg:top-24">
+            <CardHeader>
+              <CardTitle>Receipt preview</CardTitle>
+              <CardDescription>
+                Updates as you type. The items are samples.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div
+                className="rounded-lg border bg-white p-4"
+                aria-label="Receipt preview"
+              >
+                <ReceiptBody r={sample} />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

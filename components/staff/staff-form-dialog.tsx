@@ -260,8 +260,8 @@ function StaffForm({
               generate
             />
             <FieldDescription>
-              Generated for you. They can change it themselves from the user
-              menu.
+              Generated for you.They will be asked to choose their own password
+              the first time they sign in
             </FieldDescription>
             {errors.password && <FieldError>{errors.password}</FieldError>}
           </Field>
