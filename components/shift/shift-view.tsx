@@ -33,7 +33,7 @@ import { formatKsh, parseCents, toCents } from "@/lib/pos/money";
 import { useApi } from "@/lib/use-api";
 import { cn } from "@/lib/utils";
 import { KpiCard } from "../dashboard/kpi-cards";
-import { InputGroup, InputGroupInput } from "../ui/input-group";
+import { DatePicker } from "../app/date-picker-mine";
 
 export type Shift = {
   date: string;
@@ -85,16 +85,8 @@ export function ShiftView({ initial }: { initial: Shift }) {
 
       <Field className="max-w-xs">
         <FieldLabel htmlFor="shift-date">Shift date</FieldLabel>
-        {/* <InputGroup> */}
-        <Input
-          id="shift-date"
-          type="date"
-          value={date}
-          max={initial.date}
-          onChange={(e) => void load(e.target.value)}
-          className="h-11 bg-card"
-        />
-        {/* </InputGroup> */}
+
+        <DatePicker value={date} onChange={(v) => void load(v)} />
       </Field>
 
       {error && (

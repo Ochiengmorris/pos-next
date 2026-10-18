@@ -44,6 +44,7 @@ import { useApi } from "@/lib/use-api";
 import { cn } from "@/lib/utils";
 import { VoidDialog, type VoidTarget } from "./void-dialog";
 import { DateRangePicker } from "../app/date-range-picker";
+import { EtimsBadge } from "../etims/etims-badge";
 
 type Preset = "all" | "today" | "7d" | "custom";
 const METHOD: Record<string, string> = {
@@ -259,6 +260,7 @@ export function TransactionsManager({
               <TableHead className="hidden md:table-cell">Payment</TableHead>
               <TableHead className="text-right">Total</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="hidden lg:table-cell">eTIMS</TableHead>
               <TableHead className="text-right">
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -268,7 +270,7 @@ export function TransactionsManager({
             {items.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={8}
+                  colSpan={9}
                   className="py-16 text-center text-muted-foreground"
                 >
                   No sales match.
@@ -311,6 +313,9 @@ export function TransactionsManager({
                       ) : (
                         <Badge variant="secondary">Completed</Badge>
                       )}
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell">
+                      <EtimsBadge status={s.etims} />
                     </TableCell>
                     <TableCell className="text-right">
                       <Button

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MoreVertical, Plus, Search, Tags } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
@@ -159,6 +159,14 @@ export function ProductsManager({
     }
   }
 
+  const categoryItems = useMemo(
+    () => [
+      { value: "all", label: "All categories" },
+      ...categories.map((c) => ({ value: c.id, label: c.name })),
+    ],
+    [categories],
+  );
+
   const { items, meta } = data;
   const filtered =
     search !== "" || categoryId !== "all" || lowStock || includeInactive;
@@ -211,6 +219,7 @@ export function ProductsManager({
         </InputGroup>
 
         <Select
+          items={categoryItems}
           value={categoryId}
           onValueChange={(val) => {
             setCategoryId(val ?? "all");

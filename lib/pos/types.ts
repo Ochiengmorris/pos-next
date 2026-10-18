@@ -1,4 +1,3 @@
-// lib/pos/types.ts
 export const PRODUCT_PAGE_SIZE = 100;
 
 export type Category = {
@@ -42,7 +41,33 @@ export type PaymentEntry = {
   mpesaPaymentId?: string; // links the sale to the confirmed STK payment
 };
 
+export type EtimsDisplay =
+  | "NOT_REQUIRED"
+  | "PENDING"
+  | "ACCEPTED"
+  | "FAILED"
+  | "CANCELLED"
+  | "MOCK_ACCEPTED";
+
+export type ReceiptEtims = {
+  status: EtimsDisplay;
+  environment: string;
+  tin: string | null;
+  invoiceNo: number | null;
+  scuReceiptNo: number | null;
+  scuTotalReceiptNo: number | null;
+  sdcId: string | null;
+  mrcNo: string | null;
+  sdcDateTime: string | null;
+  internalData: string | null;
+  signature: string | null;
+  qrPayload: string | null;
+  acceptedAt: string | null;
+  copy: number;
+} | null;
+
 export type Receipt = {
+  saleId: string;
   status: "COMPLETED" | "VOIDED" | "REFUNDED";
   store: {
     name: string;
@@ -55,11 +80,20 @@ export type Receipt = {
   date: string;
   cashier: string;
   customer: string | null;
+  customerPin: string | null;
   items: {
     name: string;
     quantity: number;
     unitPrice: string;
     lineTotal: string;
+    taxTyCd: string;
+  }[];
+  taxBreakdown: {
+    code: string;
+    rate: string;
+    net: string;
+    vat: string;
+    gross: string;
   }[];
   subtotal: string;
   taxTotal: string;
@@ -71,4 +105,5 @@ export type Receipt = {
     tendered: string | null;
   }[];
   changeDue: string;
+  etims: ReceiptEtims;
 };

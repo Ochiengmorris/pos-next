@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { AlertCircle, LayoutGrid, ScanBarcode, Search } from "lucide-react";
+import { AlertCircle, ScanBarcode, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ import {
 import { useProducts } from "@/hooks/use-products";
 import { ApiError } from "@/lib/api";
 import { cartReducer, cartTotals } from "@/lib/pos/cart";
-import { newRequestId } from "@/lib/pos/request-id";
 import type {
   Category,
   PaymentEntry,
@@ -65,8 +64,6 @@ export function PosTerminal({
   const [receipt, setReceipt] = useState<Receipt | null>(null);
 
   const searchRef = useRef<HTMLInputElement>(null);
-  const lastSignature = useRef("");
-  const lastRequestId = useRef("");
 
   const totals = cartTotals(cart);
   const cartQty = Object.fromEntries(
@@ -164,16 +161,11 @@ export function PosTerminal({
     }
   }
 
-  // Same cart + same payments = same key, so a retry can never create a second sale
-  function requestIdFor(signature: string) {
-    if (signature !== lastSignature.current) {
-      lastSignature.current = signature;
-      lastRequestId.current = newRequestId();
-    }
-    return lastRequestId.current;
-  }
-
-  async function checkout(entries: PaymentEntry[]) {
+  async function checkout(
+    entries: PaymentEntry[],
+    idempotencyKey: string,
+    customer?: { pin: string; name?: string },
+  ) {
     const body = {
       items: cart.map((l) => ({
         productId: l.productId,
@@ -188,6 +180,10 @@ export function PosTerminal({
         ...(e.method === "CARD" && e.reference && { reference: e.reference }),
         ...(e.mpesaPaymentId && { mpesaPaymentId: e.mpesaPaymentId }),
       })),
+      ...(customer && {
+        customerPin: customer.pin,
+        customerName: customer.name,
+      }),
     };
 
     let sale: { id: string; receiptNo: string };
@@ -196,7 +192,7 @@ export function PosTerminal({
         method: "POST",
         body: JSON.stringify({
           ...body,
-          clientRequestId: requestIdFor(JSON.stringify(body)),
+          clientRequestId: idempotencyKey,
         }),
       });
     } catch (e) {

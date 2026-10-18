@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import type { Receipt } from "@/lib/pos/types";
 // import type { StoreSettings } from "@/lib/settings/types";
 import { useApi } from "@/lib/use-api";
-import { StoreSettings } from "./types";
+import { StoreSettings } from "../../lib/settings/types";
 
 const pick = (s: StoreSettings): StoreSettings => ({
   name: s.name,
@@ -79,6 +79,7 @@ export function SettingsForm({ initial }: { initial: StoreSettings }) {
 
   // sample sale, with the shop details you are typing, using the real receipt layout
   const sample: Receipt = {
+    saleId: "sample",
     status: "COMPLETED",
     store: {
       name: v.name.trim() || "Your shop name",
@@ -87,16 +88,34 @@ export function SettingsForm({ initial }: { initial: StoreSettings }) {
       taxPin: v.taxPin.trim(),
       footer: v.receiptFooter.trim(),
     },
+    customerPin: null,
     receiptNo: "RCP-000123",
     date: "2026-10-14T09:30:00+03:00",
     cashier: "Chris Cashier",
     customer: null,
+    etims: null,
     items: [
-      { name: "Soda 500ml", quantity: 2, unitPrice: "70", lineTotal: "140" },
-      { name: "Bread 400g", quantity: 1, unitPrice: "65", lineTotal: "65" },
+      {
+        name: "Soda 500ml",
+        quantity: 2,
+        unitPrice: "70",
+        lineTotal: "140",
+        taxTyCd: "B",
+      },
+      {
+        name: "Bread 400g",
+        quantity: 1,
+        unitPrice: "65",
+        lineTotal: "65",
+        taxTyCd: "A",
+      },
     ],
     subtotal: "185.69",
     taxTotal: "19.31",
+    taxBreakdown: [
+      { code: "A", rate: "0", net: "65.00", vat: "0.00", gross: "65.00" },
+      { code: "B", rate: "16", net: "120.69", vat: "19.31", gross: "140.00" },
+    ],
     total: "205",
     payments: [
       { method: "CASH", amount: "205", reference: null, tendered: "500" },
@@ -235,16 +254,10 @@ export function SettingsForm({ initial }: { initial: StoreSettings }) {
             </CardContent>
           </Card>
 
-          <Card className="lg:sticky lg:top-24">
-            <CardHeader>
-              <CardTitle>Receipt preview</CardTitle>
-              <CardDescription>
-                Updates as you type. The items are samples.
-              </CardDescription>
-            </CardHeader>
+          <Card className="lg:sticky lg:top-24 border-none bg-transparent shadow-none ring-0 p-0 ">
             <CardContent>
               <div
-                className="rounded-lg border bg-white p-4"
+                className="rounded-lg border border-purple-500/20 bg-white p-4"
                 aria-label="Receipt preview"
               >
                 <ReceiptBody r={sample} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { MoreVertical, PackagePlus, Search } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -58,6 +58,14 @@ export function StockLevels({
   const [action, setAction] = useState<StockAction | null>(null);
   const { items, meta } = list.data;
 
+  const categoryItems = useMemo(
+    () => [
+      { value: "all", label: "All categories" },
+      ...categories.map((c) => ({ value: c.id, label: c.name })),
+    ],
+    [categories],
+  );
+
   return (
     <div className="grid gap-4">
       <div role="search" className="flex flex-wrap items-center gap-3">
@@ -76,6 +84,7 @@ export function StockLevels({
 
         <Select
           value={list.filters.categoryId}
+          items={categoryItems}
           onValueChange={(v) => list.update({ categoryId: v ?? "all" })}
         >
           <SelectTrigger
