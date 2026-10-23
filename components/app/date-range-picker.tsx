@@ -68,10 +68,11 @@ export function DateRangePicker({
         render={
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             aria-label="Date range"
+            size={"sm"}
             className={cn(
-              "h-11 w-64 gap-2 bg-card font-normal flex justify-between",
+              "h-11 w-64 gap-2 bg-card font-bold flex justify-between",
               !committed?.from && "text-muted-foreground",
               className,
             )}

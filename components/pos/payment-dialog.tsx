@@ -307,13 +307,13 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
 
         <div className="rounded-xl bg-muted p-4 text-center">
           <p className="text-sm text-muted-foreground">Amount due</p>
-          <p className="text-4xl font-semibold tabular-nums">
+          <p className="text-5xl font-bold tabular-nums">
             {formatKsh(Math.max(remaining, 0))}
           </p>
         </div>
 
         {showPin ? (
-          <div className="grid gap-3 rounded-xl border p-3">
+          <div className="grid gap-3 border-l-3 p-3">
             <Field data-invalid={!!pinProblem}>
               <FieldLabel htmlFor="cust-pin">Customer KRA PIN</FieldLabel>
               <Input
@@ -323,7 +323,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                 maxLength={11}
                 autoComplete="off"
                 spellCheck={false}
-                className="h-11 font-mono"
+                className="h-11 font-mono pl-4 bg-background border-none focus-visible:border-3"
                 aria-invalid={!!pinProblem}
                 disabled={locked}
               />
@@ -338,7 +338,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                 value={pinName}
                 maxLength={60}
                 autoComplete="off"
-                className="h-11"
+                className="h-11 font-mono pl-4 bg-background border-none focus-visible:border-3"
                 onChange={(e) => setPinName(e.target.value)}
                 disabled={locked}
               />
@@ -417,7 +417,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                 <Button
                   key={m}
                   type="button"
-                  variant={method === m ? "default" : "outline"}
+                  variant={method === m ? "secondary" : "outline"}
                   aria-pressed={method === m}
                   className="h-11"
                   disabled={mpesaBusy}
@@ -448,7 +448,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                       <FieldLabel htmlFor="cash">
                         Cash received (KSh)
                       </FieldLabel>
-                      <InputGroup className="h-11">
+                      <InputGroup className="h-14 pl-4 bg-background border-none focus-visible:border-3">
                         <InputGroupInput
                           id="cash"
                           ref={cashRef}
@@ -456,7 +456,6 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                           autoComplete="off"
                           value={cash}
                           onChange={(e) => setCash(e.target.value)}
-                          className="h-12 text-lg"
                         />
                       </InputGroup>
                     </Field>
@@ -467,6 +466,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                           type="button"
                           variant="outline"
                           className="h-10"
+                          size={"sm"}
                           onClick={() => setCash(centsToInput(c))}
                         >
                           {c === remaining ? "Exact" : formatKsh(c)}
@@ -474,7 +474,10 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                       ))}
                     </div>
                     {draft.change !== undefined && draft.change > 0 && (
-                      <p className="text-lg font-semibold" role="status">
+                      <p
+                        className="text-lg font-semibold text-center"
+                        role="status"
+                      >
                         Change to give: {formatKsh(draft.change)}
                       </p>
                     )}
@@ -506,6 +509,9 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                         className="h-12"
                       />
                     </Field> */}
+                    <p className="text-center text-muted-foreground">
+                      Coming soon
+                    </p>
                   </>
                 )}
               </form>

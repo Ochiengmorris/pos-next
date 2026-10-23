@@ -117,7 +117,7 @@ export function ProductList({
               type="button"
               disabled={out}
               onClick={() => onAdd(p)}
-              className="flex h-12 w-full items-center gap-3 px-4 text-left text-sm hover:bg-accent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex h-12 w-full items-center gap-3 px-4 text-left text-sm hover:bg-accent/10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span className="min-w-0 flex-1 truncate font-medium">
                 {p.name}

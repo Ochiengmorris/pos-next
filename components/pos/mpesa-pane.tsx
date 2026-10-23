@@ -42,7 +42,7 @@ export function MpesaPane({
   if (state.phase === "sending") {
     return (
       <div
-        className="flex items-center gap-3 rounded-xl border p-4"
+        className="flex items-center gap-3 rounded-xl border border-secondary/20 p-4"
         role="status"
       >
         <Loader2 className="size-5 animate-spin" aria-hidden />
@@ -54,7 +54,7 @@ export function MpesaPane({
   if (state.phase === "paid") {
     return (
       <div
-        className="flex items-center gap-3 rounded-xl border p-4"
+        className="flex items-center gap-3 rounded-xl border border-secondary/20 p-4"
         role="status"
       >
         <Loader2 className="size-5 animate-spin" aria-hidden />
@@ -65,7 +65,7 @@ export function MpesaPane({
 
   if (state.phase === "waiting") {
     return (
-      <div className="grid gap-4 rounded-xl border p-4">
+      <div className="grid gap-4 rounded-xl border border-secondary/20 p-4">
         <div className="flex items-start gap-3">
           <Loader2
             className="mt-0.5 size-5 shrink-0 animate-spin"
@@ -162,7 +162,10 @@ export function MpesaPane({
       }}
     >
       {state.phase === "failed" && (
-        <Alert variant="destructive">
+        <Alert
+          variant="destructive"
+          className="font-semibold border-secondary/20"
+        >
           <AlertCircle aria-hidden />
           <AlertDescription>{state.message}</AlertDescription>
         </Alert>
@@ -170,16 +173,15 @@ export function MpesaPane({
 
       <Field>
         <FieldLabel htmlFor="mpesa-phone">Customer phone</FieldLabel>
-        <InputGroup className="h-11">
+        <InputGroup className="h-11 pl-3 bg-background border-none focus-visible:border-3">
           <InputGroupInput
             id="mpesa-phone"
             type="tel"
             inputMode="tel"
             autoComplete="off"
-            placeholder="0712 345 678"
+            placeholder="0712345678"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="h-12 text-lg"
           />
         </InputGroup>
       </Field>
@@ -188,7 +190,7 @@ export function MpesaPane({
         <FieldLabel htmlFor="mpesa-amount">
           Amount (KSh, whole shillings)
         </FieldLabel>
-        <InputGroup className="h-11">
+        <InputGroup className="h-11 pl-3 bg-background border-none focus-visible:border-3">
           <InputGroupInput
             id="mpesa-amount"
             inputMode="numeric"
@@ -200,7 +202,6 @@ export function MpesaPane({
                 value: e.target.value.replace(/\D/g, ""),
               })
             }
-            className="h-12 text-lg"
           />
         </InputGroup>
       </Field>

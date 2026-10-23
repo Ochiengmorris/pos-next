@@ -202,7 +202,7 @@ export function ProductsManager({
       />
 
       <div role="search" className="flex flex-wrap items-center gap-3">
-        <InputGroup className="h-11 max-w-sm min-w-60 flex-1 bg-card">
+        <InputGroup className="h-11 max-w-sm min-w-60 flex-1 bg-card border-none focus-visible:border-3">
           <InputGroupAddon>
             <Search aria-hidden />
           </InputGroupAddon>
@@ -279,7 +279,7 @@ export function ProductsManager({
 
       <div
         className={cn(
-          "rounded-xl border bg-card flex-1 shadow-sm transition-opacity",
+          "rounded-xl border border-secondary/20 bg-card flex-1 shadow-sm transition-opacity",
           loading && "opacity-60",
         )}
         aria-busy={loading}

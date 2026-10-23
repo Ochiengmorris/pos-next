@@ -69,7 +69,7 @@ export function StockLevels({
   return (
     <div className="grid gap-4">
       <div role="search" className="flex flex-wrap items-center gap-3">
-        <InputGroup className="h-11 max-w-sm min-w-60 flex-1 bg-card">
+        <InputGroup className="h-11 max-w-sm min-w-60 flex-1 bg-card border-none focus-visible:border-3">
           <InputGroupAddon>
             <Search aria-hidden />
           </InputGroupAddon>
@@ -131,7 +131,7 @@ export function StockLevels({
 
       <div
         className={cn(
-          "rounded-xl border bg-card shadow-sm transition-opacity",
+          "rounded-xl border border-secondary/20 bg-card shadow-sm transition-opacity",
           list.loading && "opacity-60",
         )}
         aria-busy={list.loading}
@@ -195,7 +195,7 @@ export function StockLevels({
                     <div className="flex items-center justify-end gap-1">
                       <Button
                         type="button"
-                        variant="outline"
+                        variant="secondary"
                         className="h-10"
                         onClick={() =>
                           setAction({ mode: "restock", product: p })
@@ -213,7 +213,10 @@ export function StockLevels({
                         >
                           <MoreVertical aria-hidden />
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent
+                          align="end"
+                          className={"rounded-xl"}
+                        >
                           <DropdownMenuItem
                             onClick={() =>
                               setAction({ mode: "adjust", product: p })

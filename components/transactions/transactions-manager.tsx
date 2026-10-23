@@ -97,7 +97,7 @@ export function TransactionsManager({
     setLoading(true);
     (async () => {
       try {
-        const qs = new URLSearchParams({ page: String(page), limit: "9" });
+        const qs = new URLSearchParams({ page: String(page), limit: "10" });
         if (debouncedReceipt.trim()) qs.set("receipt", debouncedReceipt.trim());
         if (status !== "all") qs.set("status", status);
         if (from) qs.set("from", startOfDayISO(from));
@@ -160,7 +160,7 @@ export function TransactionsManager({
       />
 
       <div role="search" className="flex flex-wrap items-center gap-3">
-        <InputGroup className="h-11 max-w-xs min-w-52 flex-1 bg-card">
+        <InputGroup className="h-11 max-w-xs min-w-52 flex-1 bg-card border-none focus-visible:border-3">
           <InputGroupAddon>
             <Search aria-hidden />
           </InputGroupAddon>
@@ -184,7 +184,7 @@ export function TransactionsManager({
           }}
         >
           <SelectTrigger
-            className="h-11 w-40 bg-card"
+            className="h-11 min-w-40  w-fit bg-card"
             aria-label="Filter by status"
           >
             <SelectValue placeholder="All statuses" />
@@ -199,7 +199,7 @@ export function TransactionsManager({
         <div
           role="group"
           aria-label="Period"
-          className="flex gap-1 rounded-lg border bg-card p-1"
+          className="flex gap-1 rounded-lg bg-card p-1"
         >
           {PRESETS.map((p) => (
             <Button
@@ -240,7 +240,7 @@ export function TransactionsManager({
 
       <div
         className={cn(
-          "rounded-xl border bg-card shadow-sm transition-opacity",
+          "rounded-xl border border-secondary/20 bg-card shadow-sm transition-opacity",
           loading && "opacity-60",
         )}
         aria-busy={loading}

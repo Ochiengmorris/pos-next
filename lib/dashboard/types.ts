@@ -58,5 +58,5 @@ export type DashboardData = {
     outOfStock: number;
     lowStock: number;
   };
-  alerts: { unclaimedMpesa: number };
+  alerts: { unclaimedMpesa: number; etimsAttention: number };
 };

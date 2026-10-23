@@ -93,12 +93,12 @@ export function MovementsPanel({
           }}
         >
           <SelectTrigger
-            className="h-11 w-44 bg-card"
+            className="h-14 w-44 bg-card"
             aria-label="Filter by type"
           >
             <SelectValue placeholder="All types" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className={"rounded-xl"}>
             <SelectItem value="all">All types</SelectItem>
             {Object.entries(MOVEMENT_LABEL).map(([value, label]) => (
               <SelectItem key={value} value={value}>
@@ -107,35 +107,6 @@ export function MovementsPanel({
             ))}
           </SelectContent>
         </Select>
-
-        {/* <label className="flex items-center gap-2 text-sm">
-          From
-          <Input
-            type="date"
-            value={from}
-            max={to || undefined}
-            onChange={(e) => {
-              setFrom(e.target.value);
-              setPage(1);
-            }}
-            className="h-11 w-40 bg-card"
-            aria-label="From date"
-          />
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          To
-          <Input
-            type="date"
-            value={to}
-            min={from || undefined}
-            onChange={(e) => {
-              setTo(e.target.value);
-              setPage(1);
-            }}
-            className="h-11 w-40 bg-card"
-            aria-label="To date"
-          />
-        </label> */}
 
         <DateRangePicker
           from={from}
@@ -175,7 +146,7 @@ export function MovementsPanel({
 
       <div
         className={cn(
-          "rounded-xl border bg-card shadow-sm transition-opacity",
+          "rounded-xl border border-secondary/20 bg-card shadow-sm transition-opacity",
           loading && "opacity-60",
         )}
         aria-busy={loading}

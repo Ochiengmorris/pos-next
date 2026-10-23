@@ -2,6 +2,7 @@ import {
   Boxes,
   ChartColumn,
   Clock,
+  FileCheck,
   House,
   Package,
   Receipt,
@@ -22,6 +23,7 @@ export const NAV: NavItem[] = [
   { label: "Products", href: "/products", icon: Package },
   { label: "Inventory", href: "/inventory", icon: Boxes },
   { label: "Reports", href: "/reports", icon: ChartColumn },
+  { label: "eTIMS", href: "/etims", icon: FileCheck },
   { label: "Staff", href: "/staff", icon: UserCog },
   { label: "Settings", href: "/settings", icon: Settings },
 ];

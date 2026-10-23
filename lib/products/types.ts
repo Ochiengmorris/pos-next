@@ -1,4 +1,4 @@
-export const PRODUCTS_PAGE_SIZE = 10;
+export const PRODUCTS_PAGE_SIZE = 9;
 
 // what a manager sees (cashiers never receive costPrice)
 export type ManagedProduct = {

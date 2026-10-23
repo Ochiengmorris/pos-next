@@ -184,7 +184,7 @@ export function ReceiptDialog({
 
           <StatusNote r={live} />
 
-          <div className="max-h-[45vh] overflow-y-auto rounded-lg border bg-white p-4">
+          <div className="max-h-[45vh] overflow-y-auto rounded-lg border border-secondary/20 bg-white p-4">
             <ReceiptBody r={live} paper={paper} />
           </div>
 
@@ -193,14 +193,14 @@ export function ReceiptDialog({
             <div
               role="group"
               aria-label="Paper width"
-              className="flex gap-1 rounded-lg border p-1"
+              className="flex gap-1 rounded-lg p-1"
             >
               {(["58mm", "80mm"] as Paper[]).map((p) => (
                 <Button
                   key={p}
                   type="button"
                   size="sm"
-                  variant={paper === p ? "default" : "ghost"}
+                  variant={paper === p ? "secondary" : "outline"}
                   aria-pressed={paper === p}
                   className="h-8"
                   onClick={() => setPaper(p)}

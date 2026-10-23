@@ -21,7 +21,7 @@ export function CategoryChips({
     <div
       role="group"
       aria-label="Product categories"
-      className="flex gap-2 overflow-x-auto pb-1"
+      className="flex gap-2 overflow-x-auto pb-1 scrollbar-none"
     >
       {chips.map((c) => (
         <Button
