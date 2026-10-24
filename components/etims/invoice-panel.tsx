@@ -143,7 +143,7 @@ export function InvoicesPanel({ initial, summary, isAdmin, onChanged }: Props) {
   return (
     <div className="grid gap-4">
       <div role="search" className="flex flex-wrap items-center gap-3">
-        <InputGroup className="h-11 max-w-sm min-w-60 flex-1 bg-card">
+        <InputGroup className="h-11 max-w-sm min-w-60 flex-1 bg-card border-none">
           <InputGroupAddon>
             <Search aria-hidden />
           </InputGroupAddon>
@@ -166,12 +166,12 @@ export function InvoicesPanel({ initial, summary, isAdmin, onChanged }: Props) {
           }}
         >
           <SelectTrigger
-            className="h-11 w-48 bg-card"
+            className="h-11 data-[size=default]:h-11 w-48 bg-card"
             aria-label="Filter by status"
           >
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className={"p-2 rounded-xl"}>
             {STATUSES.map(([v, l]) => (
               <SelectItem key={v} value={v}>
                 {l}
@@ -187,12 +187,12 @@ export function InvoicesPanel({ initial, summary, isAdmin, onChanged }: Props) {
           }}
         >
           <SelectTrigger
-            className="h-11 w-40 bg-card"
+            className="h-11 data-[size=default]:h-11 w-40 bg-card"
             aria-label="Filter by type"
           >
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className={"p-2 rounded-xl w-fit"}>
             <SelectItem value="all">Sales and credit notes</SelectItem>
             <SelectItem value="SALE">Sales</SelectItem>
             <SelectItem value="CREDIT_NOTE">Credit notes</SelectItem>
@@ -230,7 +230,7 @@ export function InvoicesPanel({ initial, summary, isAdmin, onChanged }: Props) {
 
       <div
         className={cn(
-          "rounded-xl border bg-card shadow-sm transition-opacity",
+          "rounded-xl bg-card shadow-sm transition-opacity",
           loading && "opacity-60",
         )}
         aria-busy={loading}
@@ -300,7 +300,7 @@ export function InvoicesPanel({ initial, summary, isAdmin, onChanged }: Props) {
                   <TableCell className="text-right">
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="secondary"
                       className="h-10"
                       onClick={() => setOpen(r.id)}
                       aria-label={`Details for ${r.internalNo}`}

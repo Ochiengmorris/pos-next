@@ -137,7 +137,7 @@ export function EtimsManager({
           </Alert>
         )}
         {IS_DEV && s.mock && isAdmin && mock && (
-          <div className="flex shrink-0 items-center border rounded-sm px-3 w-fit gap-3">
+          <div className="flex shrink-0 items-center rounded-sm px-3 w-fit gap-3">
             <Label
               htmlFor="mock-mode"
               className="text-sm text-muted-foreground"
@@ -152,7 +152,7 @@ export function EtimsManager({
               <SelectTrigger id="mock-mode" className="h-11 min-w-fit bg-card">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className={"rounded-xl p-2 min-w-fit"}>
                 {mock.modes.map((m) => (
                   <SelectItem key={m} value={m}>
                     {MODE_LABELS[m] ?? m}

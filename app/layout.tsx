@@ -4,6 +4,7 @@ import { Fraunces, DM_Sans } from "next/font/google";
 import { auth } from "@/auth";
 import { Providers } from "./providers";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Suspense fallback={null}>
           <SessionShell>{children}</SessionShell>
         </Suspense>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

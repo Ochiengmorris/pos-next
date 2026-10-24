@@ -19,6 +19,11 @@ const CLASS_LABEL: Record<string, string> = {
   D: "Non-VAT",
   E: "VAT",
 };
+const num = (v: string) =>
+  (toCents(v) / 100).toLocaleString("en-KE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 const money = (v: string) => formatKsh(toCents(v));
 
 // KRA's yyyyMMddHHmmss -> dd/MM/yyyy HH:mm:ss
@@ -134,7 +139,7 @@ export function ReceiptBody({
       <Row left="TOTAL" right={money(r.total)} bold />
 
       <Rule />
-      <p className="font-bold">Tax summary</p>
+      {/* <p className="font-bold">Tax summary</p>
       {r.taxBreakdown.map((t) => (
         <div key={t.code} className="mb-1">
           <p>
@@ -144,7 +149,32 @@ export function ReceiptBody({
           <Row left="  Net" right={money(t.net)} />
           <Row left="  VAT" right={money(t.vat)} />
         </div>
-      ))}
+      ))} */}
+
+      <table className="w-full border-collapse tabular-nums">
+        <thead>
+          <tr className="border-b border-dashed border-black text-left">
+            <th className="font-bold">Tax</th>
+            <th className="text-right font-bold">Net</th>
+            <th className="text-right font-bold">VAT</th>
+          </tr>
+        </thead>
+        <tbody>
+          {r.taxBreakdown.map((t) => (
+            <tr key={t.code}>
+              <td>
+                {t.code}
+                {Number(t.rate) > 0 ? ` ${Number(t.rate)}%` : ""}
+                {!narrow && CLASS_LABEL[t.code]
+                  ? ` ${CLASS_LABEL[t.code]}`
+                  : ""}
+              </td>
+              <td className="text-right">{num(t.net)}</td>
+              <td className="text-right">{num(t.vat)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       <Rule />
       {r.payments.map((p, n) => (

@@ -65,15 +65,38 @@ export function TopProductsTable({
     <Card>
       <CardHeader className="gap-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <CardTitle>Top products</CardTitle>
-            <CardDescription>The best ten in this period</CardDescription>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex-1">
+              <CardTitle>Top products</CardTitle>
+              <CardDescription>The best ten in this period</CardDescription>
+            </div>
+            <div className="flex-1 flex justify-end w-full">
+              <ExportButton
+                filename={`top-products-${file}.csv`}
+                rows={[
+                  [
+                    "Product",
+                    "SKU",
+                    "Quantity sold",
+                    "Sales",
+                    "Gross profit (excl. VAT)",
+                  ],
+                  ...rows.map((r): CsvCell[] => [
+                    r.name,
+                    r.sku,
+                    r.quantitySold,
+                    Number(r.revenue),
+                    Number(r.grossProfit),
+                  ]),
+                ]}
+              />
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex w-full items-center justify-between gap-2">
             <div
               role="group"
               aria-label="Rank by"
-              className="flex gap-1 rounded-lg border bg-card p-1"
+              className="flex gap-1 rounded-lg bg-card p-1"
             >
               {BY.map((b) => (
                 <Button
@@ -89,25 +112,6 @@ export function TopProductsTable({
                 </Button>
               ))}
             </div>
-            <ExportButton
-              filename={`top-products-${file}.csv`}
-              rows={[
-                [
-                  "Product",
-                  "SKU",
-                  "Quantity sold",
-                  "Sales",
-                  "Gross profit (excl. VAT)",
-                ],
-                ...rows.map((r): CsvCell[] => [
-                  r.name,
-                  r.sku,
-                  r.quantitySold,
-                  Number(r.revenue),
-                  Number(r.grossProfit),
-                ]),
-              ]}
-            />
           </div>
         </div>
       </CardHeader>
@@ -158,32 +162,34 @@ export function VatTable({ tax, file }: { tax: TaxData; file: string }) {
   return (
     <Card>
       <CardHeader className="gap-3">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1">
             <CardTitle>VAT summary</CardTitle>
             <CardDescription>
               VAT included in sales, by the rate applied at the time of sale.
               Not a tax return.
             </CardDescription>
           </div>
-          <ExportButton
-            filename={`vat-${file}.csv`}
-            rows={[
-              ["VAT rate %", "Net sales", "VAT", "Gross sales"],
-              ...tax.byRate.map((r): CsvCell[] => [
-                Number(r.rate),
-                Number(r.netSales),
-                Number(r.vat),
-                Number(r.gross),
-              ]),
-              [
-                "Total",
-                Number(tax.totals.netSales),
-                Number(tax.totals.vat),
-                Number(tax.totals.gross),
-              ],
-            ]}
-          />
+          <div className="flex-1 justify-end flex">
+            <ExportButton
+              filename={`vat-${file}.csv`}
+              rows={[
+                ["VAT rate %", "Net sales", "VAT", "Gross sales"],
+                ...tax.byRate.map((r): CsvCell[] => [
+                  Number(r.rate),
+                  Number(r.netSales),
+                  Number(r.vat),
+                  Number(r.gross),
+                ]),
+                [
+                  "Total",
+                  Number(tax.totals.netSales),
+                  Number(tax.totals.vat),
+                  Number(tax.totals.gross),
+                ],
+              ]}
+            />
+          </div>
         </div>
       </CardHeader>
       <CardContent>

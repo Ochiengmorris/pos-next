@@ -10,5 +10,12 @@ export function Providers({
   children: ReactNode;
   session: Session | null;
 }) {
-  return <SessionProvider session={session}>{children}</SessionProvider>;
+  return (
+    <SessionProvider
+      key={session?.user?.id ?? session?.user?.email ?? "anon"}
+      session={session}
+    >
+      {children}
+    </SessionProvider>
+  );
 }
