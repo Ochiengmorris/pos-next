@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MoreVertical, Plus, Search, Tags } from "lucide-react";
+import {
+  Download,
+  MoreVertical,
+  Plus,
+  Search,
+  Tags,
+  Upload,
+} from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -56,6 +63,8 @@ import { cn } from "@/lib/utils";
 import { CategoriesDialog } from "./categories-dialog";
 import { ProductFormDialog } from "./product-form-dialog";
 import { StockBadge } from "./stock-badge";
+import Link from "next/link";
+import { downloadText } from "@/lib/csv";
 
 const money = (v: string) => formatKsh(toCents(v));
 
@@ -179,6 +188,34 @@ export function ProductsManager({
         description="Everything you sell, with prices and stock levels."
         actions={
           <div className="flex gap-2">
+            <Link
+              href="/products/import"
+              className={buttonVariants({
+                variant: "outline",
+                className: "h-11",
+              })}
+            >
+              <Upload aria-hidden /> Import
+            </Link>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11"
+              onClick={async () => {
+                try {
+                  downloadText(
+                    "products.csv",
+                    await call<string>("/products/export"),
+                  );
+                } catch (e) {
+                  toast.error(
+                    e instanceof Error ? e.message : "Could not export",
+                  );
+                }
+              }}
+            >
+              <Download aria-hidden /> Export
+            </Button>
             <Button
               type="button"
               variant="outline"
