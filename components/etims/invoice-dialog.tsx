@@ -200,7 +200,7 @@ function Body({
       )}
 
       {canRetry && (
-        <div className="grid gap-2 rounded-lg border p-3">
+        <div className="grid gap-2 rounded-lg border border-secondary/20 p-3">
           <p className="text-sm font-semibold">Actions</p>
           <div className="flex flex-wrap gap-2">
             <Button
@@ -263,7 +263,7 @@ function Body({
         </ol>
       </section>
 
-      <details className="rounded-lg border p-3 text-sm">
+      <details className="rounded-lg border border-secondary/20 p-3 text-sm">
         <summary className="cursor-pointer font-medium">
           Data sent to KRA
         </summary>
