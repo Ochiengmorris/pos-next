@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { MoreVertical, Plus, Search, Tags } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Download,
+  MoreVertical,
+  Plus,
+  Search,
+  Tags,
+  Upload,
+} from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -56,6 +63,8 @@ import { cn } from "@/lib/utils";
 import { CategoriesDialog } from "./categories-dialog";
 import { ProductFormDialog } from "./product-form-dialog";
 import { StockBadge } from "./stock-badge";
+import Link from "next/link";
+import { downloadText } from "@/lib/csv";
 
 const money = (v: string) => formatKsh(toCents(v));
 
@@ -159,6 +168,14 @@ export function ProductsManager({
     }
   }
 
+  const categoryItems = useMemo(
+    () => [
+      { value: "all", label: "All categories" },
+      ...categories.map((c) => ({ value: c.id, label: c.name })),
+    ],
+    [categories],
+  );
+
   const { items, meta } = data;
   const filtered =
     search !== "" || categoryId !== "all" || lowStock || includeInactive;
@@ -171,6 +188,34 @@ export function ProductsManager({
         description="Everything you sell, with prices and stock levels."
         actions={
           <div className="flex gap-2">
+            <Link
+              href="/products/import"
+              className={buttonVariants({
+                variant: "outline",
+                className: "h-11",
+              })}
+            >
+              <Upload aria-hidden /> Import
+            </Link>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11"
+              onClick={async () => {
+                try {
+                  downloadText(
+                    "products.csv",
+                    await call<string>("/products/export"),
+                  );
+                } catch (e) {
+                  toast.error(
+                    e instanceof Error ? e.message : "Could not export",
+                  );
+                }
+              }}
+            >
+              <Download aria-hidden /> Export
+            </Button>
             <Button
               type="button"
               variant="outline"
@@ -194,7 +239,7 @@ export function ProductsManager({
       />
 
       <div role="search" className="flex flex-wrap items-center gap-3">
-        <InputGroup className="h-11 max-w-sm min-w-60 flex-1 bg-card">
+        <InputGroup className="h-11 max-w-sm min-w-60 flex-1 bg-card border-none focus-visible:border-3">
           <InputGroupAddon>
             <Search aria-hidden />
           </InputGroupAddon>
@@ -211,6 +256,7 @@ export function ProductsManager({
         </InputGroup>
 
         <Select
+          items={categoryItems}
           value={categoryId}
           onValueChange={(val) => {
             setCategoryId(val ?? "all");
@@ -270,7 +316,7 @@ export function ProductsManager({
 
       <div
         className={cn(
-          "rounded-xl border bg-card flex-1 shadow-sm transition-opacity",
+          "rounded-xl border border-secondary/20 bg-card flex-1 shadow-sm transition-opacity",
           loading && "opacity-60",
         )}
         aria-busy={loading}

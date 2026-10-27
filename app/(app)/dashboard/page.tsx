@@ -1,4 +1,3 @@
-// app/(app)/dashboard/page.tsx
 import {
   AlertCircle,
   CalendarDays,
@@ -42,7 +41,7 @@ export default async function DashboardPage() {
         title={`Welcome back${firstName ? `, ${firstName}` : ""}`}
         description="Here's what's happening in your store today."
         actions={
-          <div className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm">
+          <div className="flex items-center gap-2 rounded-lg border border-secondary/10 bg-card px-3 py-2 text-sm">
             <CalendarDays
               className="size-4 text-muted-foreground"
               aria-hidden
@@ -64,6 +63,23 @@ export default async function DashboardPage() {
               className="font-medium underline underline-offset-2"
             >
               Review them
+            </Link>
+            .
+          </AlertDescription>
+        </Alert>
+      )}
+      {d.alerts.etimsAttention > 0 && (
+        <Alert variant="destructive">
+          <AlertCircle aria-hidden />
+          <AlertDescription>
+            {d.alerts.etimsAttention} tax{" "}
+            {d.alerts.etimsAttention === 1 ? "invoice needs" : "invoices need"}{" "}
+            attention.{" "}
+            <Link
+              href="/etims"
+              className="font-medium underline underline-offset-2"
+            >
+              Open the eTIMS screen
             </Link>
             .
           </AlertDescription>

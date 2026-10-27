@@ -12,12 +12,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { useMpesaPayment } from "@/hooks/use-mpesa-payment";
 import { centsToInput, formatKsh, parseCents } from "@/lib/pos/money";
 import type { PaymentEntry } from "@/lib/pos/types";
 import { MpesaPane } from "./mpesa-pane";
 import { InputGroup, InputGroupInput } from "../ui/input-group";
+import { Input } from "../ui/input";
 
 type Method = "CASH" | "MPESA" | "CARD";
 type Draft = Omit<PaymentEntry, "id">;
@@ -39,7 +40,11 @@ type Props = {
    * return the original sale if it has already seen the key, and must verify
    * each `mpesaPaymentId` (exists, unclaimed, amount matches) itself.
    */
-  onSubmit: (entries: PaymentEntry[], idempotencyKey: string) => Promise<void>;
+  onSubmit: (
+    entries: PaymentEntry[],
+    idempotencyKey: string,
+    customer?: { pin: string; name?: string },
+  ) => Promise<void>;
 };
 
 // Round-ups above what is owed, for "customer gave a big note" (values in cents).
@@ -99,6 +104,14 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
   const submittingRef = useRef(false);
   // Created on the first submit attempt, reused by every retry of this sale
   const saleKey = useRef<string | null>(null);
+
+  const [showPin, setShowPin] = useState(false);
+  const [pin, setPin] = useState("");
+  const [pinName, setPinName] = useState("");
+  const pinProblem =
+    pin !== "" && !/^[AP]\d{9}[A-Z]$/.test(pin)
+      ? "A KRA PIN looks like A123456789Z"
+      : null;
 
   const paidCents = totalPaid(entries);
   const remaining = totalCents - paidCents;
@@ -178,7 +191,11 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
       setError(null);
       saleKey.current ??= newKey();
       try {
-        await onSubmit(all, saleKey.current);
+        await onSubmit(
+          all,
+          saleKey.current,
+          pin ? { pin, name: pinName.trim() || undefined } : undefined,
+        );
         // Sale is done. If the parent keeps this dialog open, the next sale gets a new key.
         saleKey.current = null;
         applyEntries([]);
@@ -192,7 +209,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
         setSubmitting(false);
       }
     },
-    [applyEntries, mpesa, onSubmit],
+    [applyEntries, mpesa, onSubmit, pin, pinName],
   );
 
   // Entries are stored before submitting, so a failed submit can simply be retried
@@ -290,10 +307,54 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
 
         <div className="rounded-xl bg-muted p-4 text-center">
           <p className="text-sm text-muted-foreground">Amount due</p>
-          <p className="text-4xl font-semibold tabular-nums">
+          <p className="text-5xl font-bold tabular-nums">
             {formatKsh(Math.max(remaining, 0))}
           </p>
         </div>
+
+        {showPin ? (
+          <div className="grid gap-3 border-l-3 p-3">
+            <Field data-invalid={!!pinProblem}>
+              <FieldLabel htmlFor="cust-pin">Customer KRA PIN</FieldLabel>
+              <Input
+                id="cust-pin"
+                value={pin}
+                onChange={(e) => setPin(e.target.value.toUpperCase().trim())}
+                maxLength={11}
+                autoComplete="off"
+                spellCheck={false}
+                className="h-11 font-mono pl-4 bg-background border-none focus-visible:border-3"
+                aria-invalid={!!pinProblem}
+                disabled={locked}
+              />
+              {pinProblem && <FieldError>{pinProblem}</FieldError>}
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="cust-name">
+                Customer name (optional)
+              </FieldLabel>
+              <Input
+                id="cust-name"
+                value={pinName}
+                maxLength={60}
+                autoComplete="off"
+                className="h-11 font-mono pl-4 bg-background border-none focus-visible:border-3"
+                onChange={(e) => setPinName(e.target.value)}
+                disabled={locked}
+              />
+            </Field>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-10 justify-self-start"
+            onClick={() => setShowPin(true)}
+            disabled={locked}
+          >
+            Business customer? Add their KRA PIN
+          </Button>
+        )}
 
         {entries.length > 0 && (
           <ul className="grid gap-2">
@@ -356,7 +417,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                 <Button
                   key={m}
                   type="button"
-                  variant={method === m ? "default" : "outline"}
+                  variant={method === m ? "secondary" : "outline"}
                   aria-pressed={method === m}
                   className="h-11"
                   disabled={mpesaBusy}
@@ -387,7 +448,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                       <FieldLabel htmlFor="cash">
                         Cash received (KSh)
                       </FieldLabel>
-                      <InputGroup className="h-11">
+                      <InputGroup className="h-14 pl-4 bg-background border-none focus-visible:border-3">
                         <InputGroupInput
                           id="cash"
                           ref={cashRef}
@@ -395,7 +456,6 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                           autoComplete="off"
                           value={cash}
                           onChange={(e) => setCash(e.target.value)}
-                          className="h-12 text-lg"
                         />
                       </InputGroup>
                     </Field>
@@ -406,6 +466,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                           type="button"
                           variant="outline"
                           className="h-10"
+                          size={"sm"}
                           onClick={() => setCash(centsToInput(c))}
                         >
                           {c === remaining ? "Exact" : formatKsh(c)}
@@ -413,7 +474,10 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                       ))}
                     </div>
                     {draft.change !== undefined && draft.change > 0 && (
-                      <p className="text-lg font-semibold" role="status">
+                      <p
+                        className="text-lg font-semibold text-center"
+                        role="status"
+                      >
                         Change to give: {formatKsh(draft.change)}
                       </p>
                     )}
@@ -445,6 +509,9 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                         className="h-12"
                       />
                     </Field> */}
+                    <p className="text-center text-muted-foreground">
+                      Coming soon
+                    </p>
                   </>
                 )}
               </form>
@@ -491,7 +558,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
             <Button
               type="button"
               className="h-11 min-w-40"
-              disabled={submitting}
+              disabled={submitting || !!pinProblem}
               aria-busy={submitting}
               onClick={() => void submitAll(entriesRef.current)}
             >
@@ -503,7 +570,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
               type="submit"
               form="payment-form"
               className="h-11 min-w-40"
-              disabled={!draft.entry || submitting}
+              disabled={!draft.entry || submitting || !!pinProblem}
               aria-busy={submitting}
             >
               {submitting && <Loader2 className="animate-spin" aria-hidden />}

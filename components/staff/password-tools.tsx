@@ -33,7 +33,7 @@ export function PasswordInput({
   // a generated password starts visible so the admin can read it out or copy it
   const [visible, setVisible] = useState(generate);
   return (
-    <InputGroup className="h-11">
+    <InputGroup className="h-11 bg-background border-0">
       <InputGroupInput
         id={id}
         type={visible ? "text" : "password"}

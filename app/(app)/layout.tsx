@@ -4,7 +4,6 @@ import { AppSidebar } from "@/components/app/app-sidebar";
 import { Topbar } from "@/components/app/topbar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { requireSession } from "@/lib/session";
-import { Toaster } from "sonner";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const session = await requireSession(); // authenticated even if the route guard were bypassed
@@ -13,7 +12,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <Toaster position="top-center" richColors />
       <AppSidebar role={session.user.role} />
       <SidebarInset>
         <Topbar

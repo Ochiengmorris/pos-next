@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { useFormStatus } from "react-dom";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -14,8 +13,14 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 // pending state also blocks double submits
-export function SubmitButton({ children }: { children: ReactNode }) {
-  const { pending } = useFormStatus();
+export function SubmitButton({
+  pending,
+  children,
+}: {
+  pending: boolean;
+  children: ReactNode;
+}) {
+  // const { pending } = useFormStatus();
   return (
     <Button
       type="submit"
@@ -35,7 +40,7 @@ export function PasswordField() {
   return (
     <Field>
       <FieldLabel htmlFor="password">Password</FieldLabel>
-      <InputGroup className="h-12">
+      <InputGroup className="h-12 bg-background border-0">
         <InputGroupAddon>
           <Lock aria-hidden />
         </InputGroupAddon>
@@ -54,7 +59,11 @@ export function PasswordField() {
             aria-pressed={visible}
             onClick={() => setVisible((v) => !v)}
           >
-            {visible ? <EyeOff aria-hidden /> : <Eye aria-hidden />}
+            {visible ? (
+              <EyeOff aria-hidden className="size-3" />
+            ) : (
+              <Eye aria-hidden />
+            )}
           </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>

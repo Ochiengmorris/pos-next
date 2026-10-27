@@ -16,8 +16,15 @@ export async function request<T>(
 ): Promise<T> {
   const res = await fetch(`${base}${path}`, {
     ...init,
+    // headers: {
+    //   "Content-Type": "application/json",
+    //   ...init.headers,
+    //   Authorization: `Bearer ${token}`,
+    // },
     headers: {
-      "Content-Type": "application/json",
+      ...(typeof FormData !== "undefined" && init.body instanceof FormData
+        ? {}
+        : { "Content-Type": "application/json" }),
       ...init.headers,
       Authorization: `Bearer ${token}`,
     },

@@ -14,7 +14,7 @@ export function parseCents(input: string): number | null {
 export function formatKsh(cents: number): string {
   const [whole, dec] = (cents / 100).toFixed(2).split(".");
   const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return `KSh ${grouped}${cents % 100 !== 0 ? `.${dec}` : ""}`;
+  return `KSH ${grouped}${cents % 100 !== 0 ? `.${dec}` : ""}`;
 }
 
 // VAT contained in a VAT-inclusive amount (display estimate; the server's figure is the official one)

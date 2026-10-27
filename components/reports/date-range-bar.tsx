@@ -30,7 +30,7 @@ export function DateRangeBar({
         aria-label="Report period"
         className="flex flex-wrap items-center gap-3"
       >
-        <div className="flex flex-wrap gap-1 rounded-lg border bg-card p-1">
+        <div className="flex flex-wrap gap-1 rounded-lg bg-transparent p-1">
           {(Object.keys(PRESET_LABEL) as FixedPreset[]).map((p) => (
             <Button
               key={p}
@@ -45,30 +45,6 @@ export function DateRangeBar({
             </Button>
           ))}
         </div>
-        {/* <label className="flex items-center gap-2 text-sm">
-          From
-          <Input
-            type="date"
-            value={range.from}
-            max={range.to}
-            onChange={(e) =>
-              e.target.value && onCustom({ ...range, from: e.target.value })
-            }
-            className="h-11 w-40 bg-card"
-          />
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          To
-          <Input
-            type="date"
-            value={range.to}
-            min={range.from}
-            onChange={(e) =>
-              e.target.value && onCustom({ ...range, to: e.target.value })
-            }
-            className="h-11 w-40 bg-card"
-          />
-        </label> */}
 
         <label htmlFor="date">
           <DateRangePicker
@@ -77,6 +53,7 @@ export function DateRangeBar({
             onChange={({ from, to }) => {
               onCustom({ ...range, to: to, from: from });
             }}
+            className="h-9"
           />
         </label>
       </div>

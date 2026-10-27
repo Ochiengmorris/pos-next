@@ -12,7 +12,7 @@ export function LastScanned({ line }: { line?: CartLine }) {
   }
   return (
     <div
-      className="flex items-center justify-between gap-4 rounded-xl border bg-card p-4 shadow-sm"
+      className="flex items-center justify-between gap-4 rounded-xl bg-card p-4 shadow-sm border border-secondary/20"
       aria-live="polite"
     >
       <div className="min-w-0">

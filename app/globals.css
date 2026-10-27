@@ -1,123 +1,118 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
+/* ------------------------------------------------------------------
+   Shopper theme — cream ground, ink-green text, mango + tomato accents.
+   shadcn/ui tokens are mapped so every component in components/ui
+   inherits the look automatically.
+------------------------------------------------------------------- */
+
 :root {
-  --background: oklch(0.994 0 0);
-  --foreground: oklch(0 0 0);
-  --card: oklch(0.994 0 0);
-  --card-foreground: oklch(0 0 0);
-  --popover: oklch(0.9911 0 0);
-  --popover-foreground: oklch(0 0 0);
-  --primary: oklch(0.5393 0.2713 286.7462);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.954 0.0063 255.4755);
-  --secondary-foreground: oklch(0.1344 0 0);
-  --muted: oklch(0.9702 0 0);
-  --muted-foreground: oklch(0.4386 0 0);
-  --accent: oklch(0.9393 0.0288 266.368);
-  --accent-foreground: oklch(0.5445 0.1903 259.4848);
-  --destructive: oklch(0.629 0.1902 23.0704);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.93 0.0094 286.2156);
-  --input: oklch(0.9401 0 0);
-  --ring: oklch(0 0 0);
-  --chart-1: oklch(0.7459 0.1483 156.4499);
-  --chart-2: oklch(0.5393 0.2713 286.7462);
-  --chart-3: oklch(0.7336 0.1758 50.5517);
-  --chart-4: oklch(0.5828 0.1809 259.7276);
-  --chart-5: oklch(0.559 0 0);
-  --sidebar: oklch(0.9777 0.0051 247.8763);
-  --sidebar-foreground: oklch(0 0 0);
-  --sidebar-primary: oklch(0 0 0);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.9401 0 0);
-  --sidebar-accent-foreground: oklch(0 0 0);
-  --sidebar-border: oklch(0.9401 0 0);
-  --sidebar-ring: oklch(0 0 0);
-  --font-sans: Cascadia Code, ui-sans-serif, sans-serif, system-ui;
-  --font-serif: Lora, serif;
-  --font-mono: IBM Plex Mono, monospace;
-  --radius: 1.4rem;
-  --shadow-x: 0px;
-  --shadow-y: 2px;
-  --shadow-blur: 3px;
-  --shadow-spread: 0px;
-  --shadow-opacity: 0.16;
-  --shadow-color: hsl(0 0% 0%);
-  --shadow-2xs: 0px 2px 3px 0px hsl(0 0% 0% / 0.08);
-  --shadow-xs: 0px 2px 3px 0px hsl(0 0% 0% / 0.08);
-  --shadow-sm:
-    0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 1px 2px -1px hsl(0 0% 0% / 0.16);
-  --shadow:
-    0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 1px 2px -1px hsl(0 0% 0% / 0.16);
-  --shadow-md:
-    0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 2px 4px -1px hsl(0 0% 0% / 0.16);
-  --shadow-lg:
-    0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 4px 6px -1px hsl(0 0% 0% / 0.16);
-  --shadow-xl:
-    0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 8px 10px -1px hsl(0 0% 0% / 0.16);
-  --shadow-2xl: 0px 2px 3px 0px hsl(0 0% 0% / 0.4);
-  --tracking-normal: -0.025em;
-  --spacing: 0.27rem;
+  /* Brand palette */
+  --cream: #f8f0e3;
+  --paper: #fdfbf5;
+  --ink: #12261f;
+  --mango: #ffb93b;
+  --tomato: #e5512f;
+  --leaf: #2e7d52;
+  --stone: #c5c9c2;
+
+  /* shadcn tokens */
+  --background: var(--cream);
+  --foreground: var(--ink);
+
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+
+  --primary: var(--mango);
+  --primary-foreground: var(--ink);
+
+  --secondary: var(--ink);
+  --secondary-foreground: var(--cream);
+
+  --muted: #efe5d3;
+  --muted-foreground: #5b6a62;
+
+  --accent: var(--tomato);
+  --accent-foreground: var(--paper);
+
+  --destructive: #c93a1c;
+  --destructive-foreground: var(--paper);
+
+  --success: var(--leaf);
+  --success-foreground: var(--paper);
+
+  --border: var(--ink);
+  --input: var(--ink);
+  --ring: var(--tomato);
+
+  --chart-1: var(--mango);
+  --chart-2: var(--tomato);
+  --chart-3: var(--leaf);
+  --chart-4: var(--ink);
+  --chart-5: var(--stone);
+
+  --sidebar: var(--cream);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--ink);
+  --sidebar-primary-foreground: var(--mango);
+  --sidebar-accent: var(--mango);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--ink);
+  --sidebar-ring: var(--tomato);
+
+  --radius: 1rem;
+
+  /* Signature "pop" shadow: hard offset, no blur */
+  --pop-shadow: 3px 4px 0 0 var(--ink);
+  --pop-shadow-sm: 2px 3px 0 0 var(--ink);
 }
 
 .dark {
-  --background: oklch(0.2223 0.006 271.1393);
-  --foreground: oklch(0.9551 0 0);
-  --card: oklch(0.2568 0.0076 274.6528);
-  --card-foreground: oklch(0.9551 0 0);
-  --popover: oklch(0.2568 0.0076 274.6528);
-  --popover-foreground: oklch(0.9551 0 0);
-  --primary: oklch(0.6132 0.2294 291.7437);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.294 0.013 272.9312);
-  --secondary-foreground: oklch(0.9551 0 0);
-  --muted: oklch(0.294 0.013 272.9312);
-  --muted-foreground: oklch(0.7058 0 0);
-  --accent: oklch(0.2795 0.0368 260.031);
-  --accent-foreground: oklch(0.7857 0.1153 246.6596);
-  --destructive: oklch(0.7106 0.1661 22.2162);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.3289 0.0092 268.3843);
-  --input: oklch(0.3289 0.0092 268.3843);
-  --ring: oklch(0.6132 0.2294 291.7437);
-  --chart-1: oklch(0.8003 0.1821 151.711);
-  --chart-2: oklch(0.6132 0.2294 291.7437);
-  --chart-3: oklch(0.8077 0.1035 19.5706);
-  --chart-4: oklch(0.6691 0.1569 260.1063);
-  --chart-5: oklch(0.7058 0 0);
-  --sidebar: oklch(0.2011 0.0039 286.0396);
-  --sidebar-foreground: oklch(0.9551 0 0);
-  --sidebar-primary: oklch(0.6132 0.2294 291.7437);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.294 0.013 272.9312);
-  --sidebar-accent-foreground: oklch(0.6132 0.2294 291.7437);
-  --sidebar-border: oklch(0.3289 0.0092 268.3843);
-  --sidebar-ring: oklch(0.6132 0.2294 291.7437);
-  --font-sans: Cascadia Code, ui-sans-serif, sans-serif, system-ui;
-  --font-serif: Lora, serif;
-  --font-mono: IBM Plex Mono, monospace;
-  --radius: 1.4rem;
-  --shadow-x: 0px;
-  --shadow-y: 2px;
-  --shadow-blur: 3px;
-  --shadow-spread: 0px;
-  --shadow-opacity: 0.16;
-  --shadow-color: hsl(0 0% 0%);
-  --shadow-2xs: 0px 2px 3px 0px hsl(0 0% 0% / 0.08);
-  --shadow-xs: 0px 2px 3px 0px hsl(0 0% 0% / 0.08);
-  --shadow-sm:
-    0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 1px 2px -1px hsl(0 0% 0% / 0.16);
-  --shadow:
-    0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 1px 2px -1px hsl(0 0% 0% / 0.16);
-  --shadow-md:
-    0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 2px 4px -1px hsl(0 0% 0% / 0.16);
-  --shadow-lg:
-    0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 4px 6px -1px hsl(0 0% 0% / 0.16);
-  --shadow-xl:
-    0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 8px 10px -1px hsl(0 0% 0% / 0.16);
-  --shadow-2xl: 0px 2px 3px 0px hsl(0 0% 0% / 0.4);
+  --background: #0d1a15;
+  --foreground: #f8f0e3;
+
+  --card: #12261f;
+  --card-foreground: #f8f0e3;
+
+  --popover: #12261f;
+  --popover-foreground: #f8f0e3;
+
+  --primary: var(--mango);
+  --primary-foreground: #12261f;
+
+  --secondary: #1d3a30;
+  --secondary-foreground: #f8f0e3;
+
+  --muted: #1a2f27;
+  --muted-foreground: #a9b5ad;
+
+  --accent: var(--tomato);
+  --accent-foreground: #fdfbf5;
+
+  --destructive: #e5512f;
+  --destructive-foreground: #fdfbf5;
+
+  --border: #f8f0e3;
+  --input: #f8f0e3;
+  --ring: var(--mango);
+
+  --sidebar: #0d1a15;
+  --sidebar-foreground: #f8f0e3;
+  --sidebar-primary: var(--mango);
+  --sidebar-primary-foreground: #12261f;
+  --sidebar-accent: #1d3a30;
+  --sidebar-accent-foreground: #f8f0e3;
+  --sidebar-border: #f8f0e3;
+  --sidebar-ring: var(--mango);
+
+  --pop-shadow: 3px 4px 0 0 #000;
+  --pop-shadow-sm: 2px 3px 0 0 #000;
 }
 
 @theme inline {
@@ -137,6 +132,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -154,39 +151,63 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
-  --font-serif: var(--font-serif);
+  /* Raw brand colors, usable as bg-mango, text-tomato, etc. */
+  --color-cream: var(--cream);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-mango: var(--mango);
+  --color-tomato: var(--tomato);
+  --color-leaf: var(--leaf);
+  --color-stone: var(--stone);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 3px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 6px);
+  --radius-2xl: calc(var(--radius) + 12px);
 
-  --shadow-2xs: var(--shadow-2xs);
-  --shadow-xs: var(--shadow-xs);
-  --shadow-sm: var(--shadow-sm);
-  --shadow: var(--shadow);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
-  --shadow-xl: var(--shadow-xl);
-  --shadow-2xl: var(--shadow-2xl);
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
 
-  --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
-  --tracking-tight: calc(var(--tracking-normal) - 0.025em);
-  --tracking-normal: var(--tracking-normal);
-  --tracking-wide: calc(var(--tracking-normal) + 0.025em);
-  --tracking-wider: calc(var(--tracking-normal) + 0.05em);
-  --tracking-widest: calc(var(--tracking-normal) + 0.1em);
+  --shadow-pop: var(--pop-shadow);
+  --shadow-pop-sm: var(--pop-shadow-sm);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/10;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
     letter-spacing: var(--tracking-normal);
+  }
+
+  /* Headings use the soft, chunky serif */
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-black tracking-tight;
+  }
+
+  /* Poster-style accent word: <em class="not-italic">…</em> or <span class="accent-word"> */
+  .accent-word {
+    @apply font-display italic font-bold text-accent;
+  }
+}
+
+@layer components {
+  /* Optional helpers if you want the pop look outside shadcn components */
+  .pop {
+    @apply border-2 border-ink shadow-pop;
+  }
+  .pop-press {
+    @apply transition-all active:translate-x-0.5 active:translate-y-0.75 active:shadow-none;
+  }
+
+  .pop-btn {
+    @apply border-ink shadow-pop-sm active:translate-x-0.5 active:translate-y-1.5 active:shadow-none;
   }
 }
 

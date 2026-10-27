@@ -10,19 +10,21 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import type { Role } from "@/lib/access";
+import { canAccess, type Role } from "@/lib/access";
 import { visibleNav } from "@/lib/nav";
+import { useEtimsAttention } from "@/hooks/use-etims-attention";
 
 export function AppSidebar({ role }: { role: Role }) {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
   const items = visibleNav(role);
-
+  const attention = useEtimsAttention(canAccess(role, ["MANAGER"]));
   return (
     <Sidebar>
       <SidebarHeader className="h-16 justify-center border-b border-sidebar-border px-4">
@@ -51,6 +53,14 @@ export function AppSidebar({ role }: { role: Role }) {
                     >
                       <Icon aria-hidden />
                       <span>{label}</span>
+                      {href === "/etims" && attention > 0 && (
+                        <SidebarMenuBadge
+                          aria-label={`${attention} tax invoices need attention`}
+                          className="bg-destructive text-white mr-2"
+                        >
+                          {attention}
+                        </SidebarMenuBadge>
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );

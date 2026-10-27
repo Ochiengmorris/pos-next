@@ -92,7 +92,7 @@ export function SalesChart({
           <div
             role="group"
             aria-label="Chart period"
-            className="flex gap-1 rounded-lg border bg-card p-1"
+            className="flex gap-1 rounded-lg bg-card p-1"
           >
             {RANGES.map((r) => (
               <Button

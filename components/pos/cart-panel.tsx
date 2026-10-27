@@ -69,7 +69,7 @@ export function CartLines({
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
-      <table className="w-full table-fixed text-sm">
+      <table className="w-full table-fixed text-sm ">
         <caption className="sr-only">Items in the current sale</caption>
         <thead className="sticky top-0 z-10 bg-card text-xs text-muted-foreground">
           <tr className="border-b">
@@ -98,7 +98,7 @@ export function CartLines({
               key={l.productId}
               className={cn(
                 compact ? "h-14" : "h-12",
-                l.productId === highlightId && "bg-accent",
+                l.productId === highlightId && "bg-accent/10",
               )}
             >
               <td className="overflow-hidden px-4">
@@ -171,7 +171,7 @@ export function CartSummary({
         <span>
           {itemCount} {itemCount === 1 ? "item" : "items"}
         </span>
-        <span>Incl. VAT (estimate) {formatKsh(vatCents)}</span>
+        <span>Incl. VAT: {formatKsh(vatCents)}</span>
       </div>
       <div className="flex items-end justify-between">
         <span className="text-base font-semibold">Total</span>
@@ -192,10 +192,10 @@ export function CartSummary({
         disabled={!hasLines}
         onClick={onPay}
       >
-        Proceed to payment
+        Proceed to pay
         <ArrowRight aria-hidden />
-        <kbd className="ml-1 hidden rounded border border-white/50 px-1.5 text-xs font-normal md:inline">
-          F9
+        <kbd className="ml-1 hidden rounded border border-secondary/50 px-1.5 text-xs font-semibold md:inline">
+          Ctrl+Enter
         </kbd>
       </Button>
 

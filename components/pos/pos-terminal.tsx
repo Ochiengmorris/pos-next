@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { AlertCircle, LayoutGrid, ScanBarcode, Search } from "lucide-react";
+import { AlertCircle, ScanBarcode, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ import {
 import { useProducts } from "@/hooks/use-products";
 import { ApiError } from "@/lib/api";
 import { cartReducer, cartTotals } from "@/lib/pos/cart";
-import { newRequestId } from "@/lib/pos/request-id";
 import type {
   Category,
   PaymentEntry,
@@ -65,8 +64,6 @@ export function PosTerminal({
   const [receipt, setReceipt] = useState<Receipt | null>(null);
 
   const searchRef = useRef<HTMLInputElement>(null);
-  const lastSignature = useRef("");
-  const lastRequestId = useRef("");
 
   const totals = cartTotals(cart);
   const cartQty = Object.fromEntries(
@@ -83,25 +80,67 @@ export function PosTerminal({
     focusSearch();
   }
 
-  // Shortcuts: F2 search, F9 pay. A scanner "types" into whatever has focus, so stray keystrokes go to search.
+  // // Shortcuts: F2 search, F9 pay. A scanner "types" into whatever has focus, so stray keystrokes go to search.
+  // useEffect(() => {
+  //   const onKey = (e: KeyboardEvent) => {
+  //     if (e.key === "F2") {
+  //       e.preventDefault();
+  //       searchRef.current?.focus();
+  //       searchRef.current?.select();
+  //       return;
+  //     }
+  //     if (e.key === "F9") {
+  //       e.preventDefault();
+  //       if (!payOpen && !receipt && cart.length > 0) setPayOpen(true);
+  //       return;
+  //     }
+  //     if (payOpen || receipt) return;
+  //     if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
+  //     if (e.target !== document.body) return;
+  //     searchRef.current?.focus();
+  //   };
+  //   window.addEventListener("keydown", onKey);
+  //   return () => window.removeEventListener("keydown", onKey);
+  // }, [payOpen, receipt, cart.length]);
+  // Shortcuts: Ctrl/Shift+Enter or Numpad+ = pay, Esc = back to search (F2/F9 kept as aliases).
+  // A scanner "types" into whatever has focus, so stray keystrokes go to search.
   useEffect(() => {
+    const goSearch = () => {
+      searchRef.current?.focus();
+      searchRef.current?.select();
+    };
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "F2") {
-        e.preventDefault();
-        searchRef.current?.focus();
-        searchRef.current?.select();
+      // Esc: back to search (the pay dialog handles its own Esc, so ignore it there)
+      if (e.key === "Escape" && !payOpen && !receipt) {
+        goSearch();
         return;
       }
-      if (e.key === "F9") {
+      if (e.key === "F2") {
         e.preventDefault();
+        goSearch();
+        return;
+      }
+
+      // Pay: Ctrl+Enter, Shift+Enter, Numpad+, or F9
+      const isPay =
+        e.key === "F9" ||
+        e.code === "NumpadAdd" ||
+        (e.key === "Enter" && (e.ctrlKey || e.shiftKey));
+
+      if (isPay) {
+        e.preventDefault(); // stops "+" from landing in the search box
+        if (e.repeat) return; // holding the key must not retrigger
         if (!payOpen && !receipt && cart.length > 0) setPayOpen(true);
         return;
       }
+
       if (payOpen || receipt) return;
       if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
       if (e.target !== document.body) return;
       searchRef.current?.focus();
     };
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [payOpen, receipt, cart.length]);
@@ -164,16 +203,11 @@ export function PosTerminal({
     }
   }
 
-  // Same cart + same payments = same key, so a retry can never create a second sale
-  function requestIdFor(signature: string) {
-    if (signature !== lastSignature.current) {
-      lastSignature.current = signature;
-      lastRequestId.current = newRequestId();
-    }
-    return lastRequestId.current;
-  }
-
-  async function checkout(entries: PaymentEntry[]) {
+  async function checkout(
+    entries: PaymentEntry[],
+    idempotencyKey: string,
+    customer?: { pin: string; name?: string },
+  ) {
     const body = {
       items: cart.map((l) => ({
         productId: l.productId,
@@ -188,6 +222,10 @@ export function PosTerminal({
         ...(e.method === "CARD" && e.reference && { reference: e.reference }),
         ...(e.mpesaPaymentId && { mpesaPaymentId: e.mpesaPaymentId }),
       })),
+      ...(customer && {
+        customerPin: customer.pin,
+        customerName: customer.name,
+      }),
     };
 
     let sale: { id: string; receiptNo: string };
@@ -196,7 +234,7 @@ export function PosTerminal({
         method: "POST",
         body: JSON.stringify({
           ...body,
-          clientRequestId: requestIdFor(JSON.stringify(body)),
+          clientRequestId: idempotencyKey,
         }),
       });
     } catch (e) {
@@ -234,7 +272,7 @@ export function PosTerminal({
           role="search"
           className="min-w-0 flex-1"
         >
-          <InputGroup className="h-12 bg-card ">
+          <InputGroup className="h-12 bg-card border-none focus-visible:border-3">
             <InputGroupAddon>
               <Search aria-hidden />
             </InputGroupAddon>
@@ -253,7 +291,7 @@ export function PosTerminal({
         <div
           role="group"
           aria-label="Layout"
-          className="flex shrink-0 gap-1 rounded-lg border bg-card p-1"
+          className="flex shrink-0 gap-1 rounded-lg p-1"
         >
           <Button
             type="button"
@@ -277,10 +315,10 @@ export function PosTerminal({
           </Button> */}
         </div>
       </div>
-      {/* <p className="hidden text-xs text-muted-foreground md:block">
-        F2 search · F9 pay · type <kbd className="font-mono">5*barcode</kbd> to
-        add five
-      </p> */}
+      <p className="hidden text-xs text-muted-foreground md:block">
+        Type to search · Ctrl + Enter to pay · type{" "}
+        <kbd className="font-mono">5*barcode</kbd> to add five
+      </p>
     </div>
   );
 

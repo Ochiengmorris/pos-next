@@ -1,8 +1,7 @@
-// components/brand/logo.tsx
-import { ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ShopperIcon } from "@/images/shopper-logo";
 
-export const APP_NAME = "Shopper";
+export const APP_NAME = "KhonaMart";
 
 export function Logo({
   tone = "dark",
@@ -12,17 +11,21 @@ export function Logo({
   className?: string;
 }) {
   return (
-    <div className={cn("flex items-center gap-3", className)}>
-      <span className="grid size-10 place-items-center rounded-xl bg-accent shadow-sm">
-        <ShoppingBag className="size-5" aria-hidden />
-      </span>
+    <div className={cn("flex items-center justify-center", className)}>
       <span
         className={cn(
-          "text-2xl font-semibold tracking-tight",
+          "relative text-2xl font-semibold tracking-tight flex items-center",
           tone === "light" ? "text-foreground" : "text-foreground",
         )}
       >
         {APP_NAME}
+        <span
+          className="absolute right-full top-1/2 mr-2 grid size-8 -translate-y-1/2 place-items-center rounded-xl bg-none "
+          aria-hidden
+        >
+          {/* <ShoppingBag className="size-4" /> */}
+          <ShopperIcon className="size-6" />
+        </span>
       </span>
     </div>
   );

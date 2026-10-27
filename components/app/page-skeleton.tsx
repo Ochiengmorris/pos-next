@@ -25,7 +25,7 @@ export function PageSkeleton({
           ))}
         </div>
       )}
-      <div className="grid gap-2 rounded-xl border bg-card p-4">
+      <div className="grid gap-2 rounded-xl border border-secondary/20 bg-card p-4">
         <Skeleton className="h-10 w-full max-w-sm" />
         {Array.from({ length: rows }, (_, i) => (
           <Skeleton key={i} className="h-12 w-full" />

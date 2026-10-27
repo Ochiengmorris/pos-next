@@ -160,7 +160,7 @@ export function StaffManager({
       />
 
       <div role="search" className="flex flex-wrap items-center gap-3">
-        <InputGroup className="h-11 max-w-sm min-w-60 flex-1 bg-card">
+        <InputGroup className="h-11 max-w-sm min-w-60 flex-1 bg-card border-none focus-visible:border-3">
           <InputGroupAddon>
             <Search aria-hidden />
           </InputGroupAddon>
@@ -183,12 +183,12 @@ export function StaffManager({
           }}
         >
           <SelectTrigger
-            className="h-11 w-44 bg-card"
+            className="h-11 data-[size=default]:h-11  w-44 bg-card"
             aria-label="Filter by role"
           >
             <SelectValue placeholder="All roles" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className={"p-2 w-fit rounded-xl"}>
             <SelectItem value="all">All roles</SelectItem>
             {(Object.keys(ROLE_LABEL) as StaffRole[]).map((r) => (
               <SelectItem key={r} value={r}>
@@ -212,7 +212,7 @@ export function StaffManager({
 
       <div
         className={cn(
-          "rounded-xl border bg-card shadow-sm transition-opacity",
+          "rounded-xl border border-secondary/20 bg-card shadow-sm transition-opacity",
           loading && "opacity-60",
         )}
         aria-busy={loading}
@@ -252,7 +252,7 @@ export function StaffManager({
                     <TableCell>
                       <div className="flex items-center gap-2 font-medium">
                         {u.name}
-                        {isSelf && <Badge variant="outline">You</Badge>}
+                        {isSelf && <Badge variant="secondary">You</Badge>}
                       </div>
                       <div className="text-xs text-muted-foreground md:hidden">
                         {u.email}
@@ -297,7 +297,10 @@ export function StaffManager({
                         >
                           <MoreVertical aria-hidden />
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent
+                          align="end"
+                          className={"rounded-xl p-1"}
+                        >
                           <DropdownMenuItem
                             onClick={() => {
                               setEditing(u);

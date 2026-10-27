@@ -204,7 +204,7 @@ function StaffForm({
             id="st-name"
             autoComplete="off"
             autoFocus
-            className="h-11"
+            className="h-11 bg-background"
             value={name}
             onChange={(e) => setName(e.target.value)}
             aria-invalid={!!errors.name}
@@ -218,7 +218,7 @@ function StaffForm({
             id="st-email"
             type="email"
             autoComplete="off"
-            className="h-11"
+            className="h-11 bg-background"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             aria-invalid={!!errors.email}
@@ -233,10 +233,13 @@ function StaffForm({
             onValueChange={(v) => setRole((v as StaffRole) ?? "CASHIER")}
             disabled={isSelf}
           >
-            <SelectTrigger id="st-role" className="h-11 w-full">
+            <SelectTrigger
+              id="st-role"
+              className="h-11 w-full data-[size=default]:h-11 bg-background"
+            >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className={"p-2 rounded-xl"}>
               {(Object.keys(ROLE_LABEL) as StaffRole[]).map((r) => (
                 <SelectItem key={r} value={r}>
                   {ROLE_LABEL[r]}
@@ -257,6 +260,7 @@ function StaffForm({
               value={password}
               onChange={setPassword}
               invalid={!!errors.password}
+              
               generate
             />
             <FieldDescription>
