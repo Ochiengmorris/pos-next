@@ -1,7 +1,9 @@
 import {
+  Banknote,
   Boxes,
   ChartColumn,
   Clock,
+  FileBarChart2,
   FileCheck,
   House,
   Package,
@@ -19,11 +21,13 @@ export const NAV: NavItem[] = [
   { label: "Home", href: "/dashboard", icon: House },
   { label: "Pos", href: "/pos", icon: ShoppingCart },
   { label: "Transactions", href: "/transactions", icon: Receipt },
+  { label: "Cash", href: "/cash", icon: Banknote },
   { label: "My shift", href: "/shift", icon: Clock },
   { label: "Products", href: "/products", icon: Package },
   { label: "Inventory", href: "/inventory", icon: Boxes },
   { label: "Reports", href: "/reports", icon: ChartColumn },
   { label: "eTIMS", href: "/etims", icon: FileCheck },
+  { label: "Stock count", href: "/stock-count", icon: FileBarChart2 },
   { label: "Staff", href: "/staff", icon: UserCog },
   { label: "Settings", href: "/settings", icon: Settings },
 ];

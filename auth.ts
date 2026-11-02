@@ -1,4 +1,3 @@
-// auth.ts
 import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import type { Role } from "@/lib/access";

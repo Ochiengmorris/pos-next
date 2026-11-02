@@ -1,12 +1,28 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MoreVertical, Plus, Search } from "lucide-react";
+import {
+  MoreVertical,
+  Plus,
+  Search,
+  Mail,
+  Shield,
+  User,
+  Calendar,
+  AlertTriangle,
+} from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +36,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   InputGroup,
@@ -34,14 +51,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useDebounced } from "@/hooks/use-debounced";
 import { formatDateTime } from "@/lib/dashboard/format";
 import {
@@ -60,6 +69,185 @@ const ROLE_VARIANT: Record<StaffRole, "default" | "secondary" | "outline"> = {
   MANAGER: "secondary",
   CASHIER: "outline",
 };
+
+const ROLE_ICON: Record<StaffRole, React.ElementType> = {
+  ADMIN: Shield,
+  MANAGER: User,
+  CASHIER: User,
+};
+
+function StaffCard({
+  user,
+  isSelf,
+  onEdit,
+  onResetPassword,
+  onDeactivate,
+  onReactivate,
+}: {
+  user: StaffUser;
+  isSelf: boolean;
+  onEdit: () => void;
+  onResetPassword: () => void;
+  onDeactivate: () => void;
+  onReactivate: () => void;
+}) {
+  const RoleIcon = ROLE_ICON[user.role];
+  const isActive = user.isActive;
+
+  return (
+    <Card
+      className={cn(
+        "flex flex-col transition-all hover:shadow-pop-md",
+        !isActive && "opacity-60 border-destructive/30",
+      )}
+    >
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <User className="size-6 text-primary" aria-hidden />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <CardTitle className="text-lg font-semibold truncate">
+                  {user.name}
+                </CardTitle>
+                {isSelf && (
+                  <Badge variant="secondary" className="text-xs">
+                    You
+                  </Badge>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground truncate">
+                {user.email}
+              </p>
+            </div>
+          </div>
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger
+              className={buttonVariants({ variant: "ghost", size: "icon" })}
+              aria-label={`Actions for ${user.name}`}
+            >
+              <MoreVertical aria-hidden />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="rounded-xl p-1 w-48">
+              <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
+              <DropdownMenuItem onClick={onResetPassword}>
+                Reset password
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {isActive ? (
+                <DropdownMenuItem
+                  disabled={isSelf}
+                  onClick={onDeactivate}
+                  className="text-destructive focus:text-destructive"
+                >
+                  {isSelf ? "Deactivate (not your own account)" : "Deactivate"}
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  onClick={onReactivate}
+                  className="text-success focus:text-success"
+                >
+                  Reactivate
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>{" "}
+          </DropdownMenu>
+        </div>
+      </CardHeader>
+
+      <CardContent className="pb-3 space-y-3">
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted">
+            <RoleIcon className="size-3.5 text-muted-foreground" aria-hidden />
+            <span className="font-medium capitalize">
+              {ROLE_LABEL[user.role].toLowerCase()}
+            </span>
+          </div>
+          <Badge
+            variant={isActive ? "secondary" : "destructive"}
+            className={cn(
+              "px-3 py-1.5",
+              isActive
+                ? "bg-teal-50 text-teal-800"
+                : "bg-destructive/10 text-destructive",
+            )}
+          >
+            {isActive ? "Active" : "Deactivated"}
+          </Badge>
+        </div>
+
+        {isActive && user.mustChangePassword && (
+          <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
+            <AlertTriangle className="size-3.5 shrink-0" aria-hidden />
+            <span>Must change password on next sign in</span>
+          </div>
+        )}
+
+        <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t">
+          <Calendar className="size-3.5 shrink-0" aria-hidden />
+          <span>Added {formatDateTime(user.createdAt)}</span>
+        </div>
+      </CardContent>
+
+      <CardFooter className="pt-0 flex justify-end gap-2">
+        <Button variant="outline" size="sm" className="h-9" onClick={onEdit}>
+          Edit
+        </Button>
+        {isActive ? (
+          !isSelf && (
+            <Button
+              variant="destructive"
+              size="sm"
+              className="h-9"
+              onClick={onDeactivate}
+            >
+              Deactivate
+            </Button>
+          )
+        ) : (
+          <Button
+            variant="secondary"
+            size="sm"
+            className="h-9"
+            onClick={onReactivate}
+          >
+            Reactivate
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
+  );
+}
+
+function EmptyState({ hasFilters }: { hasFilters: boolean }) {
+  return (
+    <div className="text-center py-16">
+      <User
+        className="size-16 text-muted-foreground/50 mx-auto mb-4"
+        aria-hidden
+      />
+      <h3 className="text-lg font-semibold text-foreground mb-2">
+        {hasFilters ? "No staff match your filters" : "No staff members yet"}
+      </h3>
+      <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+        {hasFilters
+          ? "Try adjusting your search or filters to find what you're looking for."
+          : "Get started by adding your first staff member."}
+      </p>
+      {hasFilters && (
+        <Button
+          variant="outline"
+          className="h-10"
+          onClick={() => window.location.reload()}
+        >
+          Clear filters
+        </Button>
+      )}
+    </div>
+  );
+}
 
 export function StaffManager({
   initialData,
@@ -89,7 +277,7 @@ export function StaffManager({
 
   useEffect(() => {
     if (skipFirst.current) {
-      skipFirst.current = false; // the server already gave us page 1
+      skipFirst.current = false;
       return;
     }
     let cancelled = false;
@@ -139,6 +327,7 @@ export function StaffManager({
   }
 
   const { items, meta } = data;
+  const hasFilters = search !== "" || role !== "all";
 
   return (
     <div className="mx-auto grid max-w-7xl gap-6">
@@ -183,12 +372,12 @@ export function StaffManager({
           }}
         >
           <SelectTrigger
-            className="h-11 data-[size=default]:h-11  w-44 bg-card"
+            className="h-11 data-[size=default]:h-11 w-44 bg-card"
             aria-label="Filter by role"
           >
             <SelectValue placeholder="All roles" />
           </SelectTrigger>
-          <SelectContent className={"p-2 w-fit rounded-xl"}>
+          <SelectContent className="p-2 w-fit rounded-xl">
             <SelectItem value="all">All roles</SelectItem>
             {(Object.keys(ROLE_LABEL) as StaffRole[]).map((r) => (
               <SelectItem key={r} value={r}>
@@ -211,140 +400,42 @@ export function StaffManager({
       )}
 
       <div
-        className={cn(
-          "rounded-xl border border-secondary/20 bg-card shadow-sm transition-opacity",
-          loading && "opacity-60",
-        )}
+        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         aria-busy={loading}
       >
-        <Table>
-          <caption className="sr-only">Staff accounts</caption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead className="hidden md:table-cell">Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden lg:table-cell">Added</TableHead>
-              <TableHead className="w-12">
-                <span className="sr-only">Actions</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="py-16 text-center text-muted-foreground"
-                >
-                  No staff match.
-                </TableCell>
-              </TableRow>
-            ) : (
-              items.map((u) => {
-                const isSelf = u.id === currentUserId;
-                return (
-                  <TableRow
-                    key={u.id}
-                    className={cn(!u.isActive && "opacity-60")}
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-2 font-medium">
-                        {u.name}
-                        {isSelf && <Badge variant="secondary">You</Badge>}
-                      </div>
-                      <div className="text-xs text-muted-foreground md:hidden">
-                        {u.email}
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {u.email}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={ROLE_VARIANT[u.role]}>
-                        {ROLE_LABEL[u.role]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="flex gap-2">
-                      {u.isActive ? (
-                        <Badge
-                          variant="secondary"
-                          className="bg-teal-50 text-teal-800"
-                        >
-                          Active
-                        </Badge>
-                      ) : (
-                        <Badge variant="destructive">Deactivated</Badge>
-                      )}
-                      {u.isActive && u.mustChangePassword && (
-                        <div className="mt-1 text-xs text-muted-foreground">
-                          Must change password
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="hidden whitespace-nowrap text-muted-foreground lg:table-cell">
-                      {formatDateTime(u.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger
-                          className={buttonVariants({
-                            variant: "ghost",
-                            size: "icon",
-                          })}
-                          aria-label={`Actions for ${u.name}`}
-                        >
-                          <MoreVertical aria-hidden />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className={"rounded-xl p-1"}
-                        >
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setEditing(u);
-                              setFormOpen(true);
-                            }}
-                          >
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setResetting(u)}>
-                            Reset password
-                          </DropdownMenuItem>
-                          {u.isActive ? (
-                            <DropdownMenuItem
-                              disabled={isSelf}
-                              onClick={() => setDeactivating(u)}
-                            >
-                              {isSelf
-                                ? "Deactivate (not your own account)"
-                                : "Deactivate"}
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem
-                              onClick={() => void setActive(u, true)}
-                            >
-                              Reactivate
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
+        {items.length === 0 ? (
+          <div className="col-span-full">
+            <EmptyState hasFilters={hasFilters} />
+          </div>
+        ) : (
+          items.map((u) => {
+            const isSelf = u.id === currentUserId;
+            return (
+              <StaffCard
+                key={u.id}
+                user={u}
+                isSelf={isSelf}
+                onEdit={() => {
+                  setEditing(u);
+                  setFormOpen(true);
+                }}
+                onResetPassword={() => setResetting(u)}
+                onDeactivate={() => setDeactivating(u)}
+                onReactivate={() => void setActive(u, true)}
+              />
+            );
+          })
+        )}
       </div>
 
-      <Pager
-        meta={meta}
-        count={items.length}
-        loading={loading}
-        onPage={setPage}
-      />
+      {items.length > 0 && (
+        <Pager
+          meta={meta}
+          count={items.length}
+          loading={loading}
+          onPage={setPage}
+        />
+      )}
 
       <StaffFormDialog
         open={formOpen}

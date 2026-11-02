@@ -211,6 +211,60 @@
   }
 }
 
+/* Sonner toast customizations to match design system */
+@layer components {
+  /* Toast progress bar - match toast variant colors */
+  [data-sonner-toast] [data-sonner-progress] {
+    background: currentColor;
+  }
+
+  /* Success toast progress */
+  [data-sonner-toast][data-type="success"] [data-sonner-progress] {
+    background: var(--success);
+  }
+
+  /* Error toast progress */
+  [data-sonner-toast][data-type="error"] [data-sonner-progress] {
+    background: var(--destructive);
+  }
+
+  /* Warning toast progress */
+  [data-sonner-toast][data-type="warning"] [data-sonner-progress] {
+    background: var(--primary);
+  }
+
+  /* Info toast progress */
+  [data-sonner-toast][data-type="info"] [data-sonner-progress] {
+    background: var(--secondary);
+  }
+
+  /* Loading toast progress */
+  [data-sonner-toast][data-type="loading"] [data-sonner-progress] {
+    background: var(--muted-foreground);
+  }
+
+  /* Close button hover state */
+  [data-sonner-toast] [data-sonner-close-button]:hover {
+    background: var(--muted);
+    color: var(--muted-foreground);
+  }
+
+  /* Action button styling */
+  [data-sonner-toast] [data-sonner-action] {
+    @apply border-2 border-ink shadow-pop-sm active:translate-x-0.5 active:translate-y-0.75 active:shadow-none transition-all;
+  }
+
+  /* Ensure toaster container uses proper z-index */
+  .toaster {
+    z-index: 9999;
+  }
+
+  /* Toast enter/exit animations match the design */
+  [data-sonner-toast] {
+    @apply border-2 shadow-pop;
+  }
+}
+
 @media print {
   @page {
     size: 80mm auto;
