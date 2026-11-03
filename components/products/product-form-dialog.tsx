@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useMemo, useRef, useState } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -19,6 +18,8 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
+  FieldSet,
+  FieldLegend,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -36,6 +37,7 @@ import { useApi } from "@/lib/use-api";
 const NONE = "none"; // a select item can't have an empty value
 const MONEY = /^\d+(\.\d{1,2})?$/;
 const WHOLE = /^\d+$/;
+const VAT_PRESETS = ["16", "8", "0"];
 
 type Values = {
   name: string;
@@ -49,6 +51,24 @@ type Values = {
   initialStock: string;
 };
 type Errors = Partial<Record<keyof Values, string>>;
+
+// Order matters: first invalid field in this list gets focus.
+const FIELD_IDS: Record<keyof Values, string> = {
+  name: "p-name",
+  sku: "p-sku",
+  barcode: "p-barcode",
+  categoryId: "p-category",
+  price: "p-price",
+  costPrice: "p-cost",
+  taxRate: "p-vat",
+  reorderLevel: "p-reorder",
+  initialStock: "p-stock",
+};
+
+const ksh = new Intl.NumberFormat("en-KE", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
 
 function initialValues(p: ManagedProduct | null): Values {
   if (!p) {
@@ -165,25 +185,66 @@ function ProductForm({
 }: Omit<Props, "open" | "onOpenChange"> & { onCancel: () => void }) {
   const call = useApi();
   const isEdit = product !== null;
-  const [v, setV] = useState<Values>(() => initialValues(product));
+  const initial = useMemo(() => initialValues(product), [product]);
+  const [v, setV] = useState<Values>(initial);
   const [errors, setErrors] = useState<Errors>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const alertRef = useRef<HTMLDivElement>(null);
 
-  const set = (field: keyof Values) => (value: string) =>
+  const dirty = useMemo(
+    () => (Object.keys(v) as (keyof Values)[]).some((k) => v[k] !== initial[k]),
+    [v, initial],
+  );
+
+  // Base UI's Select shows the raw value unless it is given value -> label pairs.
+  const categoryItems = useMemo(
+    () => [
+      { value: NONE, label: "No category" },
+      ...categories.map((c) => ({ value: c.id, label: c.name })),
+    ],
+    [categories],
+  );
+
+  const set = (field: keyof Values) => (value: string) => {
     setV((cur) => ({ ...cur, [field]: value }));
+    setErrors((cur) => (cur[field] ? { ...cur, [field]: undefined } : cur));
+  };
   const text = (field: keyof Values) => ({
     value: v[field],
     onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
       set(field)(e.target.value),
     "aria-invalid": !!errors[field],
   });
+  const selectOnFocus = (e: React.FocusEvent<HTMLInputElement>) =>
+    e.target.select();
+
+  // Price breakdown: only when the numbers are valid
+  const breakdown = useMemo(() => {
+    if (!MONEY.test(v.price)) return null;
+    const price = Number(v.price);
+    const rate = /^\d{1,3}(\.\d{1,2})?$/.test(v.taxRate)
+      ? Number(v.taxRate)
+      : null;
+    const vat = rate !== null ? price - price / (1 + rate / 100) : null;
+    const cost =
+      v.costPrice && MONEY.test(v.costPrice) ? Number(v.costPrice) : null;
+    const profit = cost !== null ? price - cost : null;
+    const margin = profit !== null && price > 0 ? (profit / price) * 100 : null;
+    return { vat, profit, margin };
+  }, [v.price, v.taxRate, v.costPrice]);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     const found = validate(v, isEdit);
     setErrors(found);
-    if (Object.keys(found).length > 0) return;
+    const firstBad = (Object.keys(FIELD_IDS) as (keyof Values)[]).find(
+      (k) => found[k],
+    );
+    if (firstBad) {
+      document.getElementById(FIELD_IDS[firstBad])?.focus();
+      return;
+    }
 
     setSubmitting(true);
     setServerError(null);
@@ -198,14 +259,24 @@ function ProductForm({
       if (err instanceof ApiError && err.status === 409) {
         // the server names the clashing field
         const m = err.message.toLowerCase();
-        if (m.includes("sku")) setErrors({ sku: err.message });
-        else if (m.includes("barcode")) setErrors({ barcode: err.message });
-        else setServerError(err.message);
+        if (m.includes("sku")) {
+          setErrors({ sku: err.message });
+          document.getElementById(FIELD_IDS.sku)?.focus();
+        } else if (m.includes("barcode")) {
+          setErrors({ barcode: err.message });
+          document.getElementById(FIELD_IDS.barcode)?.focus();
+        } else setServerError(err.message);
       } else {
         setServerError(
           err instanceof Error ? err.message : "Could not save the product",
         );
       }
+      requestAnimationFrame(() =>
+        alertRef.current?.scrollIntoView({
+          block: "nearest",
+          behavior: "smooth",
+        }),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -214,159 +285,254 @@ function ProductForm({
   return (
     <form onSubmit={submit} noValidate>
       <FieldGroup>
-        {serverError && (
-          <Alert variant="destructive">
-            <AlertCircle aria-hidden />
-            <AlertDescription>{serverError}</AlertDescription>
-          </Alert>
-        )}
-
-        <Field data-invalid={!!errors.name}>
-          <FieldLabel htmlFor="p-name">Name</FieldLabel>
-          <Input
-            id="p-name"
-            autoComplete="off"
-            autoFocus
-            className="h-11"
-            {...text("name")}
-          />
-          {errors.name && <FieldError>{errors.name}</FieldError>}
-        </Field>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field data-invalid={!!errors.sku}>
-            <FieldLabel htmlFor="p-sku">SKU</FieldLabel>
-            <Input
-              id="p-sku"
-              autoComplete="off"
-              className="h-11"
-              {...text("sku")}
-            />
-            {errors.sku && <FieldError>{errors.sku}</FieldError>}
-          </Field>
-          <Field data-invalid={!!errors.barcode}>
-            <FieldLabel htmlFor="p-barcode">Barcode (optional)</FieldLabel>
-            <Input
-              id="p-barcode"
-              autoComplete="off"
-              inputMode="numeric"
-              className="h-11"
-              {...text("barcode")}
-            />
-            {errors.barcode && <FieldError>{errors.barcode}</FieldError>}
-          </Field>
+        <div ref={alertRef}>
+          {serverError && (
+            <Alert variant="destructive">
+              <AlertCircle aria-hidden />
+              <AlertDescription>{serverError}</AlertDescription>
+            </Alert>
+          )}
         </div>
 
-        <Field>
-          <FieldLabel htmlFor="p-category">Category</FieldLabel>
-          <Select
-            value={v.categoryId}
-            onValueChange={(val) => set("categoryId")(val ?? NONE)}
-          >
-            <SelectTrigger id="p-category" className="h-11 w-full">
-              <SelectValue placeholder="No category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={NONE}>No category</SelectItem>
-              {categories.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+        {/* ---------- Details ---------- */}
+        <FieldSet>
+          <FieldLegend variant="label">Details</FieldLegend>
+          <FieldGroup>
+            <Field data-invalid={!!errors.name}>
+              <FieldLabel htmlFor="p-name">Name</FieldLabel>
+              <Input
+                id="p-name"
+                autoComplete="off"
+                autoFocus
+                className="h-11 bg-background"
+                {...text("name")}
+              />
+              {errors.name && <FieldError>{errors.name}</FieldError>}
+            </Field>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field data-invalid={!!errors.price}>
-            <FieldLabel htmlFor="p-price">Selling price (KSh)</FieldLabel>
-            <Input
-              id="p-price"
-              inputMode="decimal"
-              autoComplete="off"
-              className="h-11"
-              {...text("price")}
-            />
-            <FieldDescription>
-              What the customer pays, VAT included.
-            </FieldDescription>
-            {errors.price && <FieldError>{errors.price}</FieldError>}
-          </Field>
-          <Field data-invalid={!!errors.costPrice}>
-            <FieldLabel htmlFor="p-cost">Cost price (KSh)</FieldLabel>
-            <Input
-              id="p-cost"
-              inputMode="decimal"
-              autoComplete="off"
-              className="h-11"
-              {...text("costPrice")}
-            />
-            <FieldDescription>
-              What you pay. Used for profit; never shown at the till.
-            </FieldDescription>
-            {errors.costPrice && <FieldError>{errors.costPrice}</FieldError>}
-          </Field>
-          <Field data-invalid={!!errors.taxRate}>
-            <FieldLabel htmlFor="p-vat">VAT rate (%)</FieldLabel>
-            <Input
-              id="p-vat"
-              inputMode="decimal"
-              autoComplete="off"
-              className="h-11"
-              {...text("taxRate")}
-            />
-            <FieldDescription>
-              Use 0 for zero-rated or exempt items.
-            </FieldDescription>
-            {errors.taxRate && <FieldError>{errors.taxRate}</FieldError>}
-          </Field>
-          <Field data-invalid={!!errors.reorderLevel}>
-            <FieldLabel htmlFor="p-reorder">Reorder level</FieldLabel>
-            <Input
-              id="p-reorder"
-              inputMode="numeric"
-              autoComplete="off"
-              className="h-11"
-              {...text("reorderLevel")}
-            />
-            <FieldDescription>
-              Flagged as low stock at or below this.
-            </FieldDescription>
-            {errors.reorderLevel && (
-              <FieldError>{errors.reorderLevel}</FieldError>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field data-invalid={!!errors.sku}>
+                <FieldLabel htmlFor="p-sku">SKU</FieldLabel>
+                <Input
+                  id="p-sku"
+                  autoComplete="off"
+                  className="h-11 bg-background"
+                  {...text("sku")}
+                />
+                {errors.sku && <FieldError>{errors.sku}</FieldError>}
+              </Field>
+              <Field data-invalid={!!errors.barcode}>
+                <FieldLabel htmlFor="p-barcode">Barcode (optional)</FieldLabel>
+                <Input
+                  id="p-barcode"
+                  autoComplete="off"
+                  inputMode="numeric"
+                  className="h-11 bg-background"
+                  placeholder="Scan or type"
+                  // Scanners finish with Enter; don't let that submit the form.
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      document.getElementById(FIELD_IDS.categoryId)?.focus();
+                    }
+                  }}
+                  {...text("barcode")}
+                />
+                {errors.barcode && <FieldError>{errors.barcode}</FieldError>}
+              </Field>
+            </div>
+
+            <Field>
+              <FieldLabel htmlFor="p-category">Category</FieldLabel>
+              <Select
+                items={categoryItems}
+                value={v.categoryId}
+                onValueChange={(val) => set("categoryId")(val ?? NONE)}
+              >
+                <SelectTrigger
+                  id="p-category"
+                  className="h-11 w-full bg-background"
+                >
+                  <SelectValue placeholder="No category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categoryItems.map((c) => (
+                    <SelectItem key={c.value} value={c.value}>
+                      {c.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          </FieldGroup>
+        </FieldSet>
+
+        {/* ---------- Pricing ---------- */}
+        <FieldSet>
+          <FieldLegend variant="label">Pricing</FieldLegend>
+          <FieldGroup>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field data-invalid={!!errors.price}>
+                <FieldLabel htmlFor="p-price">Selling price (KSh)</FieldLabel>
+                <Input
+                  id="p-price"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  className="h-11 bg-background"
+                  onFocus={selectOnFocus}
+                  {...text("price")}
+                />
+                <FieldDescription>
+                  What the customer pays, VAT included.
+                </FieldDescription>
+                {errors.price && <FieldError>{errors.price}</FieldError>}
+              </Field>
+              <Field data-invalid={!!errors.costPrice}>
+                <FieldLabel htmlFor="p-cost">Cost price (KSh)</FieldLabel>
+                <Input
+                  id="p-cost"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  className="h-11 bg-background"
+                  onFocus={selectOnFocus}
+                  {...text("costPrice")}
+                />
+                <FieldDescription>
+                  What you pay. Used for profit; never shown at the till.
+                </FieldDescription>
+                {errors.costPrice && (
+                  <FieldError>{errors.costPrice}</FieldError>
+                )}
+              </Field>
+            </div>
+
+            <Field data-invalid={!!errors.taxRate}>
+              <FieldLabel htmlFor="p-vat">VAT rate (%)</FieldLabel>
+              <div className="flex flex-wrap items-center gap-2">
+                {VAT_PRESETS.map((r) => (
+                  <Button
+                    key={r}
+                    type="button"
+                    size="sm"
+                    variant={v.taxRate === r ? "default" : "outline"}
+                    aria-pressed={v.taxRate === r}
+                    className="h-11 min-w-16"
+                    onClick={() => set("taxRate")(r)}
+                  >
+                    {r}%
+                  </Button>
+                ))}
+                <Input
+                  id="p-vat"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  className="h-11 w-24 "
+                  onFocus={selectOnFocus}
+                  {...text("taxRate")}
+                />
+              </div>
+              <FieldDescription>
+                16% standard, 8% for fuel and similar, 0% for zero-rated or
+                exempt items. You can confirm the exact tax class later in eTIMS
+                tax review.
+              </FieldDescription>
+              {errors.taxRate && <FieldError>{errors.taxRate}</FieldError>}
+            </Field>
+
+            {breakdown &&
+              (breakdown.vat !== null || breakdown.profit !== null) && (
+                <dl className="grid grid-cols-2 gap-3 rounded-lg bg-muted p-3 text-sm">
+                  {breakdown.vat !== null && (
+                    <div>
+                      <dt className="text-muted-foreground">
+                        VAT in the price
+                      </dt>
+                      <dd className="font-medium">
+                        KSh {ksh.format(breakdown.vat)}
+                      </dd>
+                    </div>
+                  )}
+                  {breakdown.profit !== null && (
+                    <div>
+                      <dt className="text-muted-foreground">
+                        Gross profit per item
+                      </dt>
+                      <dd
+                        className={
+                          breakdown.profit < 0
+                            ? "font-medium text-destructive"
+                            : "font-medium"
+                        }
+                      >
+                        KSh {ksh.format(breakdown.profit)}
+                        {breakdown.margin !== null &&
+                          ` (${breakdown.margin.toFixed(0)}%)`}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              )}
+          </FieldGroup>
+        </FieldSet>
+
+        {/* ---------- Stock ---------- */}
+        <FieldSet>
+          <FieldLegend variant="label">Stock</FieldLegend>
+          <FieldGroup>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field data-invalid={!!errors.reorderLevel}>
+                <FieldLabel htmlFor="p-reorder">Reorder level</FieldLabel>
+                <Input
+                  id="p-reorder"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  className="h-11 bg-background"
+                  onFocus={selectOnFocus}
+                  {...text("reorderLevel")}
+                />
+                <FieldDescription>
+                  Flagged as low stock at or below this.
+                </FieldDescription>
+                {errors.reorderLevel && (
+                  <FieldError>{errors.reorderLevel}</FieldError>
+                )}
+              </Field>
+
+              {!isEdit && (
+                <Field data-invalid={!!errors.initialStock}>
+                  <FieldLabel htmlFor="p-stock">Opening stock</FieldLabel>
+                  <Input
+                    id="p-stock"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    className="h-11 bg-background"
+                    onFocus={selectOnFocus}
+                    {...text("initialStock")}
+                  />
+                  <FieldDescription>
+                    Recorded as the opening quantity.
+                  </FieldDescription>
+                  {errors.initialStock && (
+                    <FieldError>{errors.initialStock}</FieldError>
+                  )}
+                </Field>
+              )}
+            </div>
+
+            {isEdit && (
+              <p className="rounded-lg bg-muted p-3 text-sm text-muted-foreground">
+                Current stock:{" "}
+                <span className="font-medium text-foreground">
+                  {product.stockQty}
+                </span>
+                . To change it, use Inventory so the change is recorded.
+              </p>
             )}
-          </Field>
-        </div>
+          </FieldGroup>
+        </FieldSet>
 
-        {isEdit ? (
-          <p className="rounded-lg bg-muted p-3 text-sm text-muted-foreground">
-            Current stock:{" "}
-            <span className="font-medium text-foreground">
-              {product.stockQty}
-            </span>
-            . To change it, use Inventory so the change is recorded.
-          </p>
-        ) : (
-          <Field data-invalid={!!errors.initialStock}>
-            <FieldLabel htmlFor="p-stock">Opening stock</FieldLabel>
-            <Input
-              id="p-stock"
-              inputMode="numeric"
-              autoComplete="off"
-              className="h-11"
-              {...text("initialStock")}
-            />
-            <FieldDescription>
-              Recorded as the opening quantity. Later changes go through
-              Inventory.
-            </FieldDescription>
-            {errors.initialStock && (
-              <FieldError>{errors.initialStock}</FieldError>
-            )}
-          </Field>
-        )}
-
-        <div className="flex justify-end gap-2 pt-2">
+        {/* Sticky so the buttons stay visible while the form scrolls */}
+        <div className="sticky bottom-0 -mx-1 flex justify-end gap-2 bg-transparent px-1 pt-3 pb-1">
           <Button
             type="button"
             variant="outline"
@@ -379,7 +545,7 @@ function ProductForm({
           <Button
             type="submit"
             className="h-11 min-w-32"
-            disabled={submitting}
+            disabled={submitting || (isEdit && !dirty)}
             aria-busy={submitting}
           >
             {submitting && <Loader2 className="animate-spin" aria-hidden />}
