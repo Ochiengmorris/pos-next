@@ -93,12 +93,12 @@ export function MovementsPanel({
           }}
         >
           <SelectTrigger
-            className="h-14 w-44 bg-card"
+            className="h-10 py-5 w-44 bg-card"
             aria-label="Filter by type"
           >
             <SelectValue placeholder="All types" />
           </SelectTrigger>
-          <SelectContent className={"rounded-xl"}>
+          <SelectContent className={"rounded-xl p-2 min-w-fit"}>
             <SelectItem value="all">All types</SelectItem>
             {Object.entries(MOVEMENT_LABEL).map(([value, label]) => (
               <SelectItem key={value} value={value}>

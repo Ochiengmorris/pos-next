@@ -160,7 +160,7 @@ export function ShiftPanel({ initial }: { initial: CurrentShift }) {
 
       <section
         aria-label="Cash movements"
-        className="rounded-xl border bg-card shadow-sm"
+        className="rounded-xl border border-secondary/20 bg-card shadow-sm"
       >
         <h2 className="flex items-center gap-2 border-b p-4 text-sm font-semibold">
           <Landmark className="size-4" aria-hidden /> Paid-outs and drops

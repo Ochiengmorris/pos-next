@@ -22,6 +22,7 @@ import { formatDateTime } from "@/lib/dashboard/format";
 import { useApi } from "@/lib/use-api";
 import { cn } from "@/lib/utils";
 import { KpiCard } from "../dashboard/kpi-cards";
+import { DatePicker } from "../app/date-picker-mine";
 
 export function CashManager({ initial }: { initial: DaySummary }) {
   const call = useApi();
@@ -66,12 +67,10 @@ export function CashManager({ initial }: { initial: DaySummary }) {
         title="Cash"
         description="Every cashier's drawer for the day: what came in, what went out, and what was found."
         actions={
-          <Input
-            type="date"
-            aria-label="Day"
+          <DatePicker
             value={date}
-            max={initial.date}
-            onChange={(e) => e.target.value && setDate(e.target.value)}
+            aria-label="Day"
+            onChange={(v) => void setDate(v)}
             className="h-11 w-44 bg-card"
           />
         }
@@ -137,7 +136,7 @@ export function CashManager({ initial }: { initial: DaySummary }) {
 
       <div
         className={cn(
-          "rounded-xl border bg-card shadow-sm transition-opacity",
+          "rounded-xl border border-secondary/20 bg-card shadow-sm transition-opacity",
           loading && "opacity-60",
         )}
         aria-busy={loading}

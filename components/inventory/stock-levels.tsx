@@ -88,12 +88,12 @@ export function StockLevels({
           onValueChange={(v) => list.update({ categoryId: v ?? "all" })}
         >
           <SelectTrigger
-            className="h-11 w-48 bg-card"
+            className="h-10 py-5 w-48 bg-card"
             aria-label="Filter by category"
           >
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-xl p-2 min-w-fit">
             <SelectItem value="all">All categories</SelectItem>
             {categories.map((c) => (
               <SelectItem key={c.id} value={c.id}>

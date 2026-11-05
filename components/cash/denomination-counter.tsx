@@ -16,7 +16,7 @@ export function DenominationCounter({
     DENOMS.reduce((s, d) => s + d * (Number(c[d]) || 0), 0);
 
   return (
-    <details className="rounded-lg border p-3 text-sm">
+    <details className="rounded-lg border border-secondary/20 shadow-2xl p-3 text-sm">
       <summary className="cursor-pointer font-medium">
         Count notes and coins
       </summary>

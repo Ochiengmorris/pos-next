@@ -160,7 +160,7 @@ export function TransactionsManager({
       />
 
       <div role="search" className="flex flex-wrap items-center gap-3">
-        <InputGroup className="h-11 max-w-xs min-w-52 flex-1 bg-card border-none focus-visible:border-3">
+        <InputGroup className="h-11 max-w-xs min-w-52 flex-1 bg-card focus-visible:border-ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
           <InputGroupAddon>
             <Search aria-hidden />
           </InputGroupAddon>
@@ -184,12 +184,12 @@ export function TransactionsManager({
           }}
         >
           <SelectTrigger
-            className="h-11 min-w-40  w-fit bg-card"
+            className="h-11 py-5 min-w-40  w-fit bg-card"
             aria-label="Filter by status"
           >
             <SelectValue placeholder="All statuses" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-xl p-2 min-w-fit">
             <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="COMPLETED">Completed</SelectItem>
             <SelectItem value="VOIDED">Voided</SelectItem>

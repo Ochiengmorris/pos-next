@@ -8,7 +8,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { MpesaController } from "@/hooks/use-mpesa-payment";
 import { formatKsh } from "@/lib/pos/money";
-import { InputGroup, InputGroupInput } from "../ui/input-group";
+import { INPUT_CLASS } from "./payment-dialog";
 
 const clock = (s: number) =>
   `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
@@ -173,37 +173,37 @@ export function MpesaPane({
 
       <Field>
         <FieldLabel htmlFor="mpesa-phone">Customer phone</FieldLabel>
-        <InputGroup className="h-11 pl-3 bg-background border-none focus-visible:border-3">
-          <InputGroupInput
-            id="mpesa-phone"
-            type="tel"
-            inputMode="tel"
-            autoComplete="off"
-            placeholder="0712345678"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </InputGroup>
+        <Input
+          id="mpesa-phone"
+          type="tel"
+          inputMode="tel"
+          className={`${INPUT_CLASS} h-11`}
+          autoComplete="off"
+          placeholder="0712345678"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
       </Field>
 
       <Field>
         <FieldLabel htmlFor="mpesa-amount">
           Amount (KSh, whole shillings)
         </FieldLabel>
-        <InputGroup className="h-11 pl-3 bg-background border-none focus-visible:border-3">
-          <InputGroupInput
-            id="mpesa-amount"
-            inputMode="numeric"
-            autoComplete="off"
-            value={amount}
-            onChange={(e) =>
-              setAmountState({
-                maxShillings,
-                value: e.target.value.replace(/\D/g, ""),
-              })
-            }
-          />
-        </InputGroup>
+        {/* <InputGroup className="h-11 pl-3 bg-background border-none focus-visible:border-3"> */}
+        <Input
+          id="mpesa-amount"
+          inputMode="numeric"
+          autoComplete="off"
+          className={`${INPUT_CLASS} h-11`}
+          value={amount}
+          onChange={(e) =>
+            setAmountState({
+              maxShillings,
+              value: e.target.value.replace(/\D/g, ""),
+            })
+          }
+        />
+        {/* </InputGroup> */}
       </Field>
 
       {remainingCents % 100 !== 0 && (

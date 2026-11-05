@@ -239,7 +239,7 @@ export function ProductsManager({
       />
 
       <div role="search" className="flex flex-wrap items-center gap-3">
-        <InputGroup className="h-11 max-w-sm min-w-60 flex-1 bg-card border-none focus-visible:border-3">
+        <InputGroup className="h-10 max-w-sm min-w-60 flex-1 bg-card border-none focus-visible:border-3">
           <InputGroupAddon>
             <Search aria-hidden />
           </InputGroupAddon>
@@ -264,12 +264,12 @@ export function ProductsManager({
           }}
         >
           <SelectTrigger
-            className="h-11 w-48 bg-card"
+            className="h-10 py-5 w-48 bg-card"
             aria-label="Filter by category"
           >
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-xl p-2 min-w-fit">
             <SelectItem value="all">All categories</SelectItem>
             {categories.map((c) => (
               <SelectItem key={c.id} value={c.id}>

@@ -272,7 +272,7 @@ export function PosTerminal({
           role="search"
           className="min-w-0 flex-1"
         >
-          <InputGroup className="h-12 bg-card border-none focus-visible:border-3">
+          <InputGroup className="h-12 bg-card focus-visible:border-ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
             <InputGroupAddon>
               <Search aria-hidden />
             </InputGroupAddon>

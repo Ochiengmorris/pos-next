@@ -1,7 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AlertCircle, Loader2, Lock, X } from "lucide-react";
+import {
+  AlertCircle,
+  Banknote,
+  CreditCard,
+  Loader2,
+  Lock,
+  Smartphone,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,23 +22,32 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { useMpesaPayment } from "@/hooks/use-mpesa-payment";
 import { centsToInput, formatKsh, parseCents } from "@/lib/pos/money";
 import type { PaymentEntry } from "@/lib/pos/types";
 import { MpesaPane } from "./mpesa-pane";
-import { InputGroup, InputGroupInput } from "../ui/input-group";
-import { Input } from "../ui/input";
 
 type Method = "CASH" | "MPESA" | "CARD";
 type Draft = Omit<PaymentEntry, "id">;
 
-const LABEL: Record<Method, string> = {
-  CASH: "Cash",
-  CARD: "Card",
-  MPESA: "M-Pesa",
+/** Flip to true when card payments are ready; the card form below is already wired. */
+const CARD_ENABLED = false;
+
+const METHOD_META: Record<
+  Method,
+  { label: string; icon: LucideIcon; enabled: boolean }
+> = {
+  CASH: { label: "Cash", icon: Banknote, enabled: true },
+  MPESA: { label: "M-Pesa", icon: Smartphone, enabled: true },
+  CARD: { label: "Card", icon: CreditCard, enabled: CARD_ENABLED },
 };
 
-const METHODS = Object.keys(LABEL) as Method[];
+const METHODS = Object.keys(METHOD_META) as Method[];
+
+/** Filled, borderless look for dialog inputs; a visible border appears on focus. */
+export const INPUT_CLASS =
+  "h-14 bg-background pl-4 focus-visible:border-ring border border-transparent focus-within:border-ring focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-0";
 
 type Props = {
   open: boolean;
@@ -61,6 +79,14 @@ function totalPaid(entries: PaymentEntry[]): number {
   return entries.reduce((s, e) => s + e.amountCents, 0);
 }
 
+/** Digits and at most one decimal point with two decimals, so "12a.5.5" can't be typed. */
+function sanitizeMoney(raw: string): string {
+  const cleaned = raw.replace(/[^\d.]/g, "");
+  const [whole, ...rest] = cleaned.split(".");
+  if (rest.length === 0) return whole;
+  return `${whole}.${rest.join("").slice(0, 2)}`;
+}
+
 // crypto.randomUUID only exists in secure contexts (https / localhost);
 // a POS served over plain http on a LAN needs the fallback.
 function newKey(): string {
@@ -84,6 +110,196 @@ export function PaymentDialog(props: Props) {
   }
   return <PaymentSession key={session} {...props} />;
 }
+
+// -----------------------------------------------------------------------------
+// Presentational pieces
+// -----------------------------------------------------------------------------
+
+function AmountDue({
+  totalCents,
+  paidCents,
+  remaining,
+}: {
+  totalCents: number;
+  paidCents: number;
+  remaining: number;
+}) {
+  const pct =
+    totalCents > 0
+      ? Math.min(100, Math.round((paidCents / totalCents) * 100))
+      : 0;
+
+  return (
+    <div
+      className="rounded-xl bg-muted p-4 text-center shadow-2xl border border-card/10"
+      aria-live="polite"
+    >
+      <p className="text-sm text-muted-foreground">Amount due</p>
+      <p className="text-4xl font-bold tabular-nums sm:text-5xl">
+        {formatKsh(Math.max(remaining, 0))}
+      </p>
+      {paidCents > 0 && (
+        <div className="mt-3 grid gap-1.5">
+          <div
+            className="h-2 overflow-hidden rounded-full bg-background"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={pct}
+            aria-label="Share of the sale paid"
+          >
+            <div
+              className="h-full bg-success transition-all"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground tabular-nums">
+            {formatKsh(paidCents)} paid of {formatKsh(totalCents)}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EntryList({
+  entries,
+  disabled,
+  onRemove,
+}: {
+  entries: PaymentEntry[];
+  disabled: boolean;
+  onRemove: (id: string) => void;
+}) {
+  if (entries.length === 0) return null;
+  return (
+    <ul className="grid gap-2" aria-label="Payments added">
+      {entries.map((e) => (
+        <li
+          key={e.id}
+          className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
+        >
+          <span className="truncate">
+            {METHOD_META[e.method].label}
+            {e.reference ? ` · ${e.reference}` : ""}
+          </span>
+          <span className="flex items-center gap-1 font-medium tabular-nums">
+            {formatKsh(e.amountCents)}
+            {e.method === "MPESA" ? (
+              <span
+                className="grid size-8 place-items-center text-muted-foreground"
+                title="Received, cannot be removed"
+              >
+                <Lock
+                  className="size-4"
+                  aria-label="Received, cannot be removed"
+                />
+              </span>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-8"
+                disabled={disabled}
+                aria-label={`Remove ${METHOD_META[e.method].label} payment`}
+                onClick={() => onRemove(e.id)}
+              >
+                <X aria-hidden />
+              </Button>
+            )}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function PinSection({
+  open,
+  pin,
+  name,
+  problem,
+  disabled,
+  onOpen,
+  onPinChange,
+  onNameChange,
+  onRemove,
+}: {
+  open: boolean;
+  pin: string;
+  name: string;
+  problem: string | null;
+  disabled: boolean;
+  onOpen: () => void;
+  onPinChange: (v: string) => void;
+  onNameChange: (v: string) => void;
+  onRemove: () => void;
+}) {
+  if (!open) {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        className="h-10 justify-self-start"
+        onClick={onOpen}
+        disabled={disabled}
+      >
+        Business customer? Add their KRA PIN
+      </Button>
+    );
+  }
+
+  return (
+    <div className="grid gap-3 rounded-lg border-card shadow-2xl bg-muted/10 p-3">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-semibold">Business customer</p>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onRemove}
+          disabled={disabled}
+        >
+          Remove
+        </Button>
+      </div>
+      <Field data-invalid={!!problem}>
+        <FieldLabel htmlFor="cust-pin">Customer KRA PIN</FieldLabel>
+        <Input
+          id="cust-pin"
+          value={pin}
+          onChange={(e) => onPinChange(e.target.value.toUpperCase().trim())}
+          maxLength={11}
+          autoComplete="off"
+          spellCheck={false}
+          autoFocus
+          placeholder="A123456789Z"
+          className={`${INPUT_CLASS} font-mono`}
+          aria-invalid={!!problem}
+          disabled={disabled}
+        />
+        {problem && <FieldError>{problem}</FieldError>}
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="cust-name">Customer name (optional)</FieldLabel>
+        <Input
+          id="cust-name"
+          value={name}
+          maxLength={60}
+          autoComplete="off"
+          className={INPUT_CLASS}
+          onChange={(e) => onNameChange(e.target.value)}
+          disabled={disabled}
+        />
+      </Field>
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Session
+// -----------------------------------------------------------------------------
 
 function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
   const mpesa = useMpesaPayment();
@@ -126,6 +342,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
   const draft = useMemo((): {
     entry?: Draft;
     change?: number;
+    leftAfter?: number;
     problem?: string;
   } => {
     if (remaining <= 0) return { problem: "Nothing left to pay" };
@@ -141,6 +358,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
           tenderedCents: received,
         },
         change: received - applied,
+        leftAfter: remaining - applied,
       };
     }
     if (method === "CARD") {
@@ -158,12 +376,15 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
           amountCents: amount,
           reference: reference.trim(),
         },
+        leftAfter: remaining - amount,
       };
     }
     return {};
   }, [method, cash, cardAmount, reference, remaining]);
 
   const covers = draft.entry ? draft.entry.amountCents >= remaining : false;
+  const cashTendered =
+    draft.entry?.method === "CASH" ? draft.entry.tenderedCents : undefined;
 
   // ---------------------------------------------------------------------------
   // Actions. These are declared BEFORE any effect that calls them.
@@ -184,6 +405,15 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
 
   const submitAll = useCallback(
     async (all: PaymentEntry[]) => {
+      // An M-Pesa payment can finish the sale on its own, so the PIN must be
+      // checked here too, not only by the disabled buttons.
+      if (pinProblem) {
+        setShowPin(true);
+        setError(
+          "Fix the customer's KRA PIN, or remove it, to complete the sale.",
+        );
+        return;
+      }
       // A ref, not state: two triggers in the same tick must not both get through
       if (submittingRef.current) return;
       submittingRef.current = true;
@@ -209,7 +439,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
         setSubmitting(false);
       }
     },
-    [applyEntries, mpesa, onSubmit, pin, pinName],
+    [applyEntries, mpesa, onSubmit, pin, pinName, pinProblem],
   );
 
   // Entries are stored before submitting, so a failed submit can simply be retried
@@ -226,6 +456,17 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
   function charge() {
     if (!draft.entry || submittingRef.current) return;
     void commit({ ...draft.entry, id: String(nextId.current++) });
+  }
+
+  function removeEntry(id: string) {
+    applyEntries(entriesRef.current.filter((x) => x.id !== id));
+  }
+
+  function removePin() {
+    setPin("");
+    setPinName("");
+    setShowPin(false);
+    setError(null);
   }
 
   function leaveWithoutCompleting() {
@@ -291,120 +532,67 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
     return () => clearTimeout(t);
   }, [confirmLeave]);
 
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
+
+  // The PIN may still be fixed after M-Pesa money is in; only block it mid-request.
+  const pinDisabled = submitting || mpesaBusy;
+
+  // Base UI reports why the dialog wants to close. Extra args are read loosely
+  // because their shape differs between Base UI versions: a details object with
+  // `reason` in current ones, or (event, reason) in older betas.
+  function handleOpenChange(next: boolean, ...rest: unknown[]) {
+    if (submitting || locked) return;
+    if (!next && entries.length > 0) {
+      const details = rest[0] as { reason?: string } | undefined;
+      const reason =
+        details?.reason ?? (typeof rest[1] === "string" ? rest[1] : undefined);
+      // A stray click outside must not throw away payments already added
+      if (reason === "outside-press") return;
+    }
+    onOpenChange(next);
+  }
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(o) => !submitting && !locked && onOpenChange(o)}
-    >
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-h-[92dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Payment</DialogTitle>
           <DialogDescription>
             Sale total {formatKsh(totalCents)}
-            {paidCents > 0 && ` · Paid ${formatKsh(paidCents)}`}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="rounded-xl bg-muted p-4 text-center">
-          <p className="text-sm text-muted-foreground">Amount due</p>
-          <p className="text-5xl font-bold tabular-nums">
-            {formatKsh(Math.max(remaining, 0))}
-          </p>
-        </div>
+        <AmountDue
+          totalCents={totalCents}
+          paidCents={paidCents}
+          remaining={remaining}
+        />
 
-        {showPin ? (
-          <div className="grid gap-3 border-l-3 p-3">
-            <Field data-invalid={!!pinProblem}>
-              <FieldLabel htmlFor="cust-pin">Customer KRA PIN</FieldLabel>
-              <Input
-                id="cust-pin"
-                value={pin}
-                onChange={(e) => setPin(e.target.value.toUpperCase().trim())}
-                maxLength={11}
-                autoComplete="off"
-                spellCheck={false}
-                className="h-11 font-mono pl-4 bg-background border-none focus-visible:border-3"
-                aria-invalid={!!pinProblem}
-                disabled={locked}
-              />
-              {pinProblem && <FieldError>{pinProblem}</FieldError>}
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="cust-name">
-                Customer name (optional)
-              </FieldLabel>
-              <Input
-                id="cust-name"
-                value={pinName}
-                maxLength={60}
-                autoComplete="off"
-                className="h-11 font-mono pl-4 bg-background border-none focus-visible:border-3"
-                onChange={(e) => setPinName(e.target.value)}
-                disabled={locked}
-              />
-            </Field>
-          </div>
-        ) : (
-          <Button
-            type="button"
-            variant="ghost"
-            className="h-10 justify-self-start"
-            onClick={() => setShowPin(true)}
-            disabled={locked}
-          >
-            Business customer? Add their KRA PIN
-          </Button>
-        )}
+        <PinSection
+          open={showPin}
+          pin={pin}
+          name={pinName}
+          problem={pinProblem}
+          disabled={pinDisabled}
+          onOpen={() => setShowPin(true)}
+          onPinChange={setPin}
+          onNameChange={setPinName}
+          onRemove={removePin}
+        />
 
-        {entries.length > 0 && (
-          <ul className="grid gap-2">
-            {entries.map((e) => (
-              <li
-                key={e.id}
-                className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
-              >
-                <span>
-                  {LABEL[e.method]}
-                  {e.reference ? ` · ${e.reference}` : ""}
-                </span>
-                <span className="flex items-center gap-1 font-medium tabular-nums">
-                  {formatKsh(e.amountCents)}
-                  {e.method === "MPESA" ? (
-                    <span
-                      className="grid size-8 place-items-center text-muted-foreground"
-                      title="Received, cannot be removed"
-                    >
-                      <Lock
-                        className="size-4"
-                        aria-label="Received, cannot be removed"
-                      />
-                    </span>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      disabled={submitting}
-                      aria-label={`Remove ${LABEL[e.method]} payment`}
-                      onClick={() =>
-                        applyEntries(
-                          entriesRef.current.filter((x) => x.id !== e.id),
-                        )
-                      }
-                    >
-                      <X aria-hidden />
-                    </Button>
-                  )}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        <EntryList
+          entries={entries}
+          disabled={submitting}
+          onRemove={removeEntry}
+        />
 
         {fullyPaid ? (
           <p className="rounded-lg border p-3 text-sm" role="status">
-            Payment received in full. Complete the sale to finish.
+            {submitting
+              ? "Completing the sale…"
+              : "Payment received in full. Complete the sale to finish."}
           </p>
         ) : (
           <>
@@ -413,22 +601,31 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
               aria-label="Payment method"
               className="grid grid-cols-3 gap-2"
             >
-              {METHODS.map((m) => (
-                <Button
-                  key={m}
-                  type="button"
-                  variant={method === m ? "secondary" : "outline"}
-                  aria-pressed={method === m}
-                  className="h-11"
-                  disabled={mpesaBusy}
-                  onClick={() => {
-                    setMethod(m);
-                    mpesa.reset();
-                  }}
-                >
-                  {LABEL[m]}
-                </Button>
-              ))}
+              {METHODS.map((m) => {
+                const { label, icon: Icon, enabled } = METHOD_META[m];
+                return (
+                  <Button
+                    key={m}
+                    type="button"
+                    variant={method === m ? "secondary" : "outline"}
+                    aria-pressed={method === m}
+                    className="h-16 flex-col gap-1 text-xl"
+                    disabled={mpesaBusy || !enabled}
+                    onClick={() => {
+                      setMethod(m);
+                      mpesa.reset();
+                    }}
+                  >
+                    {/* <Icon className="size-5" aria-hidden /> */}
+                    {label}
+                    {!enabled && (
+                      <span className="text-[10px] font-normal leading-none">
+                        Coming soon
+                      </span>
+                    )}
+                  </Button>
+                );
+              })}
             </div>
 
             {method === "MPESA" ? (
@@ -448,43 +645,66 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                       <FieldLabel htmlFor="cash">
                         Cash received (KSh)
                       </FieldLabel>
-                      <InputGroup className="h-14 pl-4 bg-background border-none focus-visible:border-3">
-                        <InputGroupInput
-                          id="cash"
-                          ref={cashRef}
-                          inputMode="decimal"
-                          autoComplete="off"
-                          value={cash}
-                          onChange={(e) => setCash(e.target.value)}
-                        />
-                      </InputGroup>
+                      <Input
+                        id="cash"
+                        ref={cashRef}
+                        inputMode="decimal"
+                        enterKeyHint="done"
+                        autoComplete="off"
+                        className={`${INPUT_CLASS} h-12 text-lg`}
+                        value={cash}
+                        onChange={(e) => setCash(sanitizeMoney(e.target.value))}
+                      />
                     </Field>
-                    <div className="flex flex-wrap gap-2">
+
+                    <div
+                      className="flex flex-wrap gap-2"
+                      role="group"
+                      aria-label="Quick amounts"
+                    >
                       {quickAmounts(remaining).map((c) => (
                         <Button
                           key={c}
                           type="button"
-                          variant="outline"
-                          className="h-10"
-                          size={"sm"}
-                          onClick={() => setCash(centsToInput(c))}
+                          size="sm"
+                          variant={cashTendered === c ? "secondary" : "outline"}
+                          aria-pressed={cashTendered === c}
+                          className="h-11 tabular-nums"
+                          onClick={() => {
+                            setCash(centsToInput(c));
+                            cashRef.current?.focus();
+                          }}
                         >
                           {c === remaining ? "Exact" : formatKsh(c)}
                         </Button>
                       ))}
                     </div>
+
                     {draft.change !== undefined && draft.change > 0 && (
-                      <p
-                        className="text-lg font-semibold text-center"
+                      <div
+                        className="rounded-xl p-3 text-center text-success"
                         role="status"
                       >
-                        Change to give: {formatKsh(draft.change)}
+                        <p className="text-sm">Change to give</p>
+                        <p className="text-3xl font-bold tabular-nums">
+                          {formatKsh(draft.change)}
+                        </p>
+                      </div>
+                    )}
+
+                    {draft.leftAfter !== undefined && draft.leftAfter > 0 && (
+                      <p
+                        className="text-center text-sm text-muted-foreground"
+                        role="status"
+                      >
+                        {formatKsh(draft.leftAfter)} will still be due after
+                        this payment.
                       </p>
                     )}
                   </>
                 ) : (
                   <>
-                    {/* <Field>
+                    <Field>
                       <FieldLabel htmlFor="card-amount">
                         Amount (KSh)
                       </FieldLabel>
@@ -493,8 +713,10 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                         inputMode="decimal"
                         autoComplete="off"
                         value={cardAmount}
-                        onChange={(e) => setCardAmount(e.target.value)}
-                        className="h-12 text-lg"
+                        onChange={(e) =>
+                          setCardAmount(sanitizeMoney(e.target.value))
+                        }
+                        className={`${INPUT_CLASS} h-12 text-lg`}
                       />
                     </Field>
                     <Field>
@@ -506,12 +728,9 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                         autoComplete="off"
                         value={reference}
                         onChange={(e) => setReference(e.target.value)}
-                        className="h-12"
+                        className={`${INPUT_CLASS} h-12`}
                       />
-                    </Field> */}
-                    <p className="text-center text-muted-foreground">
-                      Coming soon
-                    </p>
+                    </Field>
                   </>
                 )}
               </form>
@@ -535,7 +754,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
             </p>
             <Button
               type="button"
-              variant="outline"
+              variant={confirmLeave ? "destructive" : "outline"}
               className="h-10 justify-self-start"
               onClick={leaveWithoutCompleting}
             >
@@ -592,7 +811,10 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
           !draft.entry &&
           method !== "MPESA" &&
           draft.problem && (
-            <p className="text-center text-xs text-muted-foreground">
+            <p
+              className="text-center text-xs text-muted-foreground"
+              role="status"
+            >
               {draft.problem}
             </p>
           )

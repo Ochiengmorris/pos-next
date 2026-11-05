@@ -7,8 +7,7 @@ import { requireSession } from "@/lib/session";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const session = await requireSession(); // authenticated even if the route guard were bypassed
-  const defaultOpen =
-    (await cookies()).get("sidebar_state")?.value !== "closed"; // remember the toggle
+  const defaultOpen = (await cookies()).get("sidebar_state")?.value !== "open"; // remember the toggle
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>

@@ -49,7 +49,7 @@
 
   --border: var(--ink);
   --input: var(--ink);
-  --ring: var(--tomato);
+  --ring: var(--ink);
 
   --chart-1: var(--mango);
   --chart-2: var(--tomato);
@@ -100,7 +100,8 @@
 
   --border: #f8f0e3;
   --input: #f8f0e3;
-  --ring: var(--mango);
+  /* --ring: var(--mango); */
+  --ring: var(--cream);
 
   --sidebar: #0d1a15;
   --sidebar-foreground: #f8f0e3;

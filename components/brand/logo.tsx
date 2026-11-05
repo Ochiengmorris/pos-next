@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { ShopperIcon } from "@/images/shopper-logo";
 
-export const APP_NAME = "KhonaMart";
+export const APP_NAME = process.env.NEXT_PUBLIC_STORE_NAME || "RAVEZAPOS";
 
 export function Logo({
   tone = "dark",

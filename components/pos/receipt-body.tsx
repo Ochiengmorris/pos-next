@@ -139,17 +139,6 @@ export function ReceiptBody({
       <Row left="TOTAL" right={money(r.total)} bold />
 
       <Rule />
-      {/* <p className="font-bold">Tax summary</p>
-      {r.taxBreakdown.map((t) => (
-        <div key={t.code} className="mb-1">
-          <p>
-            {t.code} {CLASS_LABEL[t.code] ?? ""}{" "}
-            {Number(t.rate) > 0 ? `${Number(t.rate)}%` : ""}
-          </p>
-          <Row left="  Net" right={money(t.net)} />
-          <Row left="  VAT" right={money(t.vat)} />
-        </div>
-      ))} */}
 
       <table className="w-full border-collapse tabular-nums">
         <thead>
@@ -240,6 +229,9 @@ export function ReceiptBody({
       )}
 
       {r.store.footer && <p className="mt-3 text-center">{r.store.footer}</p>}
+      <p className="text-xs text-center text-muted-foreground">
+        Powered by RAVEZAPOS
+      </p>
     </div>
   );
 }

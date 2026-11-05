@@ -163,14 +163,16 @@ export function TaxReviewPanel({
 
   return (
     <div className="grid gap-6">
-      <Alert>
-        <AlertDescription className="text-foreground">
-          Classes <strong>A (exempt)</strong>, <strong>C (zero-rated)</strong>{" "}
+      <Alert className="">
+        <AlertDescription className="text-foreground text-wrap">
+          Classes <strong>A (exempt)</strong>, <strong>C (zero-rated)</strong>
           and <strong>D (non-VAT)</strong> all charge 0%, but they are reported
           in different places on your VAT return. Existing 0% products were set
-          to A as a placeholder. Please review each one with your accountant.
+          to A as a placeholder.
         </AlertDescription>
       </Alert>
+
+      {/* <p>Please review each one with your accountant.</p> */}
 
       <Card>
         <CardHeader>
@@ -241,7 +243,7 @@ export function TaxReviewPanel({
             <Input
               aria-label="Search products"
               placeholder="Search name or SKU…"
-              className="h-11 max-w-xs bg-card"
+              className="h-11 max-w-xs bg-background"
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -331,12 +333,12 @@ export function TaxReviewPanel({
                           }
                         >
                           <SelectTrigger
-                            className="h-10 w-56"
+                            className="h-10  w-15 bg-background"
                             aria-label={`VAT class for ${p.name}`}
                           >
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className={"rounded-xl p-2 min-w-fit"}>
                             {types.map((t) => (
                               <SelectItem key={t.code} value={t.code}>
                                 {label(t)}
