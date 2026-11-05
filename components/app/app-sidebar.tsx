@@ -22,7 +22,7 @@ import { useEtimsAttention } from "@/hooks/use-etims-attention";
 
 export function AppSidebar({ role }: { role: Role }) {
   const pathname = usePathname();
-  const { setOpen, setOpenMobile } = useSidebar();
+  const { setOpenMobile } = useSidebar();
   const items = visibleNav(role);
   const attention = useEtimsAttention(canAccess(role, ["MANAGER"]));
   return (
@@ -46,7 +46,6 @@ export function AppSidebar({ role }: { role: Role }) {
                           href={href}
                           onClick={() => {
                             setOpenMobile(false);
-                            setOpen(false);
                           }}
                           aria-current={active ? "page" : undefined}
                         />
