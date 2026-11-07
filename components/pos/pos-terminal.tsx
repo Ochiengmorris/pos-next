@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { AlertCircle, ScanBarcode, Search } from "lucide-react";
+import { AlertCircle, LayoutGrid, ScanBarcode, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -221,6 +221,7 @@ export function PosTerminal({
         }),
         ...(e.method === "CARD" && e.reference && { reference: e.reference }),
         ...(e.mpesaPaymentId && { mpesaPaymentId: e.mpesaPaymentId }),
+        ...(e.tillTransId && { tillTransId: e.tillTransId }),
       })),
       ...(customer && {
         customerPin: customer.pin,
@@ -303,7 +304,7 @@ export function PosTerminal({
             <ScanBarcode aria-hidden />{" "}
             <span className="hidden lg:inline">Scan</span>
           </Button>
-          {/* <Button
+          <Button
             type="button"
             variant={mode === "grid" ? "default" : "ghost"}
             aria-pressed={mode === "grid"}
@@ -312,7 +313,7 @@ export function PosTerminal({
           >
             <LayoutGrid aria-hidden />{" "}
             <span className="hidden lg:inline">Grid</span>
-          </Button> */}
+          </Button>
         </div>
       </div>
       <p className="hidden text-xs text-muted-foreground md:block">

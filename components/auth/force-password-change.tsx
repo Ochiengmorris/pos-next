@@ -35,9 +35,10 @@ export function ForcePasswordChange() {
           <CardContent>
             <ChangePasswordForm
               onDone={async () => {
-                await update({ mustChangePassword: false }); // refresh the session cookie
-                router.replace("/");
-                router.refresh();
+                await update({ mustChangePassword: false }).then(() => {
+                  router.replace("/");
+                  router.refresh();
+                });
               }}
             />
           </CardContent>

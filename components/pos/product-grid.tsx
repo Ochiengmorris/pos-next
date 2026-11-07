@@ -43,7 +43,7 @@ function ProductTile({
       type="button"
       disabled={out}
       onClick={() => onAdd(p)}
-      className="group flex w-full flex-col gap-3 rounded-xl border bg-card p-3 text-left shadow-sm transition hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:shadow-sm"
+      className="group flex w-full flex-col gap-3 rounded-xl border border-secondary/20 bg-card p-3 text-left shadow-sm transition hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:shadow-sm"
     >
       <div className="relative grid aspect-4/3 place-items-center rounded-lg bg-muted text-2xl font-semibold text-muted-foreground">
         {initials(p.name)}

@@ -176,7 +176,7 @@ export function ReceiptDialog({
   return (
     <>
       <Dialog open onOpenChange={(o) => !o && onClose()}>
-        <DialogContent className="max-h-[92dvh] overflow-y-auto sm:max-w-sm">
+        <DialogContent className="max-h-[92dvh] overflow-y-auto  wax-w-fit  sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{live.receiptNo}</DialogDescription>
@@ -188,7 +188,7 @@ export function ReceiptDialog({
             <ReceiptBody r={live} paper={paper} />
           </div>
 
-          <div className="flex items-center justify-between gap-2 text-sm">
+          {/* <div className="flex items-center justify-between gap-2 text-sm">
             <span className="text-muted-foreground">Paper</span>
             <div
               role="group"
@@ -220,7 +220,7 @@ export function ReceiptDialog({
                 Check again
               </Button>
             )}
-          </div>
+          </div> */}
 
           <DialogFooter>
             {extraActions}
