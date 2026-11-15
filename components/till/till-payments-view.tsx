@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Download } from "lucide-react";
+import {
+  CircleCheck,
+  Download,
+  Smartphone,
+  TriangleAlert,
+  Zap,
+} from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { DatePicker } from "@/components/app/date-picker-mine";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -27,6 +33,7 @@ import { formatDateTime } from "@/lib/dashboard/format";
 import type { TillDay, TillStatus } from "@/lib/till/types";
 import { useApi } from "@/lib/use-api";
 import { cn } from "@/lib/utils";
+import { KpiCard } from "../dashboard/kpi-cards";
 
 const LABEL: Record<TillStatus, string> = {
   UNCLAIMED: "Not on a sale",
@@ -165,27 +172,42 @@ export function TillPaymentsView() {
             loading && "opacity-60",
           )}
         >
-          <Stat
+          <KpiCard
             label="Received from Safaricom"
             value={ksh(t.received.amount)}
-            note={`${t.received.count} payments`}
-          />
-          <Stat
+            icon={Smartphone}
+            tone="teal"
+          >
+            <span>{t.received.count} payments</span>
+          </KpiCard>
+          <KpiCard
             label="On a sale"
             value={ksh(t.claimed.amount)}
-            note={`${t.claimed.count} payments, by cashiers`}
-          />
-          <Stat
+            icon={CircleCheck}
+            tone="blue"
+          >
+            <span>{t.claimed.count} payments, by cashiers</span>
+          </KpiCard>
+          <KpiCard
             label="STK push"
             value={ksh(t.matchedStk.amount)}
-            note={`${t.matchedStk.count} payments, already on sales`}
-          />
-          <Stat
+            icon={Zap}
+            tone="violet"
+          >
+            <span>{t.matchedStk.count} payments, already on sales</span>
+          </KpiCard>
+          <KpiCard
             label="Not on any sale"
             value={ksh(t.unclaimed.amount)}
-            note={`${t.unclaimed.count} payments to deal with`}
-            warn={t.unclaimed.count > 0}
-          />
+            icon={TriangleAlert}
+            tone={t.unclaimed.count > 0 ? "amber" : "teal"}
+          >
+            <span>
+              {t.unclaimed.count > 0
+                ? `${t.unclaimed.count} payments to deal with`
+                : "Nothing to deal with"}
+            </span>
+          </KpiCard>
         </section>
       )}
 
