@@ -127,137 +127,6 @@ export function TillPayPanel({
     );
   }
 
-  // return (
-  //   <div className="grid gap-4">
-  //     <div className="rounded-xl border border-teal-200 bg-teal-50 p-4">
-  //       <p className="flex items-center gap-2 font-semibold text-teal-900">
-  //         <Smartphone className="size-4" aria-hidden /> Ask the customer to pay
-  //       </p>
-  //       <p className="mt-2 text-2xl font-bold tabular-nums">{ksh(amount)}</p>
-  //       <p className="mt-1 text-sm text-teal-900">
-  //         M-Pesa, Lipa na M-Pesa, Buy Goods and Services, till number{" "}
-  //         <span className="font-bold tabular-nums">
-  //           {data?.tillNumber ?? "…"}
-  //         </span>
-  //         .
-  //       </p>
-  //     </div>
-
-  //     {matches.length === 0 && !timedOut && (
-  //       <p
-  //         role="status"
-  //         className="flex items-center gap-2 text-sm text-muted-foreground"
-  //       >
-  //         <Loader2 className="size-4 animate-spin" aria-hidden /> Waiting for
-  //         the payment to arrive…
-  //       </p>
-  //     )}
-  //     {timedOut && matches.length === 0 && (
-  //       <Alert>
-  //         <AlertDescription>
-  //           Nothing has arrived after 10 minutes. Check the till number and the
-  //           amount with the customer, or look for their M-Pesa code below.
-  //         </AlertDescription>
-  //       </Alert>
-  //     )}
-
-  //     {matches.length > 0 && (
-  //       <ul className="grid gap-2" aria-label="Payments that match this sale">
-  //         {matches.map((p) => (
-  //           <li
-  //             key={p.transId}
-  //             className="flex items-center justify-between gap-3 rounded-xl border border-secondary/20 bg-card p-3 shadow-sm"
-  //           >
-  //             <div className="min-w-0">
-  //               <p className="flex items-center gap-2 font-semibold">
-  //                 <CircleCheck className="size-4 text-teal-700" aria-hidden />{" "}
-  //                 {ksh(p.amount)} received
-  //               </p>
-  //               <p className="truncate text-sm text-muted-foreground">
-  //                 {p.payerName ?? "Name not shown"} at {clock(p.time)}, code{" "}
-  //                 <span className="font-mono font-semibold text-foreground">
-  //                   {p.transId}
-  //                 </span>
-  //               </p>
-  //             </div>
-  //             <Button
-  //               type="button"
-  //               className="h-11 shrink-0"
-  //               disabled={busy !== null}
-  //               onClick={() => void use(p)}
-  //             >
-  //               {busy === p.transId ? "Checking…" : "Use this payment"}
-  //             </Button>
-  //           </li>
-  //         ))}
-  //       </ul>
-  //     )}
-  //     {matches.length > 0 && (
-  //       <p className="text-sm text-muted-foreground">
-  //         Check the code against the customer&apos;s M-Pesa message before you
-  //         continue.
-  //       </p>
-  //     )}
-
-  //     {data?.requireCodeEntry && (
-  //       <label className="grid max-w-xs gap-1 text-sm">
-  //         <span className="font-medium">
-  //           Last 4 characters of the code in the customer&apos;s message
-  //         </span>
-  //         <Input
-  //           value={typed4}
-  //           onChange={(e) => setTyped4(e.target.value.toUpperCase())}
-  //           maxLength={4}
-  //           autoComplete="off"
-  //           className="h-12 font-mono text-lg uppercase"
-  //         />
-  //       </label>
-  //     )}
-
-  //     <label className="grid max-w-xs gap-1 text-sm">
-  //       <span className="font-medium">
-  //         Customer already paid? Type the end of their M-Pesa code
-  //       </span>
-  //       <Input
-  //         value={code}
-  //         onChange={(e) => setCode(e.target.value.toUpperCase())}
-  //         placeholder="e.g. XYZ123"
-  //         maxLength={12}
-  //         autoComplete="off"
-  //         className="h-11 font-mono uppercase"
-  //       />
-  //     </label>
-
-  //     {others.length > 0 && matches.length === 0 && (
-  //       <Alert>
-  //         <AlertDescription>
-  //           Other payments arrived that do not match KSh {amount}:{" "}
-  //           {others
-  //             .map((o) => `${ksh(o.amount)} at ${clock(o.time)}`)
-  //             .join(", ")}
-  //           . If one of these is your customer, the amount is wrong. Ask a
-  //           manager to sort out the difference.
-  //         </AlertDescription>
-  //       </Alert>
-  //     )}
-
-  //     {error && (
-  //       <Alert variant="destructive">
-  //         <AlertDescription>{error}</AlertDescription>
-  //       </Alert>
-  //     )}
-
-  //     {/* <Button
-  //       type="button"
-  //       variant="outline"
-  //       className="h-11 w-fit"
-  //       onClick={onCancel}
-  //     >
-  //       Choose another way to pay
-  //     </Button> */}
-  //   </div>
-  // );
-
   return (
     <div className="grid gap-3 min-w-0">
       {/* Till info + amount + live status in one card */}
@@ -301,7 +170,7 @@ export function TillPayPanel({
             {matches.length === 1
               ? "Payment received"
               : `${matches.length} payments received`}
-            {" · "}confirm the name or code with the customer
+            {" · "}confirm the name with the customer
           </p>
 
           {data?.requireCodeEntry && (

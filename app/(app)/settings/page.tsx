@@ -1,4 +1,3 @@
-// import { SettingsForm } from "@/components/settings/settings-form";
 import { rolesFor } from "@/lib/access";
 import { api } from "@/lib/api.server";
 import type { StoreSettings } from "@/lib/settings/types";

@@ -75,7 +75,7 @@ export function ShiftPanel({ initial }: { initial: CurrentShift }) {
   const other = Object.entries(f.byMethod).filter(([m]) => m !== "CASH");
 
   return (
-    <div className="mx-auto grid max-w-5xl gap-6">
+    <div className="mx-auto grid max-w-7xl gap-6">
       <PageHeader
         title="My shift"
         description={`Shift #${s.number} · opened ${formatDateTime(s.openedAt)}`}

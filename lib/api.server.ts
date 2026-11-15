@@ -1,4 +1,3 @@
-// for server components and server actions
 import "server-only";
 import { redirect } from "next/navigation";
 import { ApiError, needsPasswordChange, request } from "@/lib/api";

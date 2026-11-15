@@ -9,12 +9,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "pop-btn bg-primary text-primary-foreground hover:brightness-95",
-        secondary: "pop-btn bg-secondary text-secondary-foreground",
-        accent: "pop-btn bg-accent text-accent-foreground",
-        outline: "pop-btn bg-card text-foreground hover:bg-muted",
-        destructive: "pop-btn bg-destructive text-destructive-foreground",
+        default: " bg-primary text-primary-foreground hover:brightness-95",
+        secondary: " bg-secondary text-secondary-foreground",
+        accent: "bg-accent text-accent-foreground",
+        outline: "bg-card text-foreground hover:bg-muted",
+        destructive: " bg-destructive text-destructive-foreground",
         // flat variants: no shadow, no visible border, no press shift
         ghost: "border-transparent hover:bg-muted",
         link: "border-transparent text-foreground underline-offset-4 hover:underline",

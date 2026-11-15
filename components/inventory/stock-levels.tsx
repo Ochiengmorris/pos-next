@@ -93,7 +93,7 @@ export function StockLevels({
           >
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
-          <SelectContent className="rounded-xl p-2 min-w-fit">
+          <SelectContent className="rounded-xl p-1 min-w-fit">
             <SelectItem value="all">All categories</SelectItem>
             {categories.map((c) => (
               <SelectItem key={c.id} value={c.id}>

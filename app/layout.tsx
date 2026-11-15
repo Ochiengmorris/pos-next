@@ -1,21 +1,20 @@
 import { Suspense, type ReactNode } from "react";
 import type { Metadata } from "next";
-import { Fraunces, DM_Sans } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { auth } from "@/auth";
 import { Providers } from "./providers";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const fraunces = Fraunces({
+const plexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  variable: "--font-fraunces",
-  axes: ["SOFT", "opsz"], // soft, rounded serif like the poster
-  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-plex-sans",
 });
-
-const dmSans = DM_Sans({
+const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-mono",
 });
 
 export const metadata: Metadata = {
@@ -29,8 +28,9 @@ async function SessionShell({ children }: { children: ReactNode }) {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en-KE" className={`${fraunces.variable} ${dmSans.variable}`}>
-      <body className="bg-canvas font-sans text-sm text-ink antialiased">
+    <html lang="en-KE" className={`${plexSans.variable} ${plexMono.variable}`}>
+      <body className="bg-background font-sans text-sm text-foreground antialiased">
+        {" "}
         <Suspense fallback={null}>
           <SessionShell>{children}</SessionShell>
         </Suspense>

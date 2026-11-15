@@ -3,117 +3,112 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ------------------------------------------------------------------
-   Shopper theme — cream ground, ink-green text, mango + tomato accents.
-   shadcn/ui tokens are mapped so every component in components/ui
-   inherits the look automatically.
-------------------------------------------------------------------- */
-
 :root {
-  /* Brand palette */
-  --cream: #f8f0e3;
-  --paper: #fdfbf5;
-  --ink: #12261f;
-  --mango: #ffb93b;
-  --tomato: #e5512f;
-  --leaf: #2e7d52;
-  --stone: #c5c9c2;
+  --background: #f4f6f8;
+  --foreground: #16202b;
+  --card: #ffffff;
+  --card-foreground: #16202b;
+  --popover: #ffffff;
+  --popover-foreground: #16202b;
 
-  /* shadcn tokens */
-  --background: var(--cream);
-  --foreground: var(--ink);
+  --primary: #1f5fbf;
+  --primary-foreground: #ffffff;
+  --ring: #1f5fbf;
 
-  --card: var(--paper);
-  --card-foreground: var(--ink);
+  --secondary: #eaeef2;
+  --secondary-foreground: #16202b;
+  --muted: #eef1f5;
+  --muted-foreground: #566475;
+  --accent: #e8f0fc; /* hover / selected tint, not a brand colour */
+  --accent-foreground: #184e9e;
 
-  --popover: var(--paper);
-  --popover-foreground: var(--ink);
+  --border: #dce2e9;
+  --border-strong: #b8c2cf;
+  --input: #8190a3;
 
-  --primary: var(--mango);
-  --primary-foreground: var(--ink);
+  --destructive: #b42318;
+  --destructive-foreground: #ffffff;
+  --destructive-soft: #fdecea;
+  --success: #146c43;
+  --success-foreground: #ffffff;
+  --success-soft: #e6f4ec;
+  --warning: #8a5300;
+  --warning-foreground: #ffffff;
+  --warning-soft: #fff3d1;
 
-  --secondary: var(--ink);
-  --secondary-foreground: var(--cream);
+  --slab: #10233f;
+  --slab-foreground: #ffffff;
+  --slab-muted: #afc0d8;
 
-  --muted: #efe5d3;
-  --muted-foreground: #5b6a62;
+  --chart-1: #1f5fbf;
+  --chart-2: #d98200;
+  --chart-3: #1b8a5a;
+  --chart-4: #5b6b7f;
+  --chart-5: #b8c2cf;
 
-  --accent: var(--tomato);
-  --accent-foreground: var(--paper);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #2b3947;
+  --sidebar-primary: #1f5fbf;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef1f5;
+  --sidebar-accent-foreground: #16202b;
+  --sidebar-border: #dce2e9;
+  --sidebar-ring: #1f5fbf;
 
-  --destructive: #c93a1c;
-  --destructive-foreground: var(--paper);
-
-  --success: var(--leaf);
-  --success-foreground: var(--paper);
-
-  --border: var(--ink);
-  --input: var(--ink);
-  --ring: var(--ink);
-
-  --chart-1: var(--mango);
-  --chart-2: var(--tomato);
-  --chart-3: var(--leaf);
-  --chart-4: var(--ink);
-  --chart-5: var(--stone);
-
-  --sidebar: var(--cream);
-  --sidebar-foreground: var(--ink);
-  --sidebar-primary: var(--ink);
-  --sidebar-primary-foreground: var(--mango);
-  --sidebar-accent: var(--mango);
-  --sidebar-accent-foreground: var(--ink);
-  --sidebar-border: var(--ink);
-  --sidebar-ring: var(--tomato);
-
-  --radius: 1rem;
-
-  /* Signature "pop" shadow: hard offset, no blur */
-  --pop-shadow: 3px 4px 0 0 var(--ink);
-  --pop-shadow-sm: 2px 3px 0 0 var(--ink);
+  --radius: 0.625rem;
 }
 
 .dark {
-  --background: #0d1a15;
-  --foreground: #f8f0e3;
+  --background: #0e141b;
+  --foreground: #e6ebf2;
+  --card: #151d26;
+  --card-foreground: #e6ebf2;
+  --popover: #151d26;
+  --popover-foreground: #e6ebf2;
 
-  --card: #12261f;
-  --card-foreground: #f8f0e3;
+  --primary: #6aa3f5;
+  --primary-foreground: #0b1626;
+  --ring: #6aa3f5;
 
-  --popover: #12261f;
-  --popover-foreground: #f8f0e3;
+  --secondary: #1e2833;
+  --secondary-foreground: #e6ebf2;
+  --muted: #1b2430;
+  --muted-foreground: #9aa8b9;
+  --accent: #1b2b45;
+  --accent-foreground: #a9c8f8;
 
-  --primary: var(--mango);
-  --primary-foreground: #12261f;
+  --border: #2a3542;
+  --border-strong: #3d4b5c;
+  --input: #5c6b7d;
 
-  --secondary: #1d3a30;
-  --secondary-foreground: #f8f0e3;
+  --destructive: #f2786c;
+  --destructive-foreground: #1a0907;
+  --destructive-soft: #2d1513;
+  --success: #4cc38a;
+  --success-foreground: #06150d;
+  --success-soft: #12281e;
+  --warning: #f2b24b;
+  --warning-foreground: #1c1203;
+  --warning-soft: #2b2110;
 
-  --muted: #1a2f27;
-  --muted-foreground: #a9b5ad;
+  --slab: #1a3358;
+  --slab-foreground: #ffffff;
+  --slab-muted: #b4c5de;
 
-  --accent: var(--tomato);
-  --accent-foreground: #fdfbf5;
+  --chart-1: #6aa3f5;
+  --chart-2: #f2b24b;
+  --chart-3: #4cc38a;
+  --chart-4: #9aa8b9;
+  --chart-5: #3d4b5c;
 
-  --destructive: #e5512f;
-  --destructive-foreground: #fdfbf5;
-
-  --border: #f8f0e3;
-  --input: #f8f0e3;
-  /* --ring: var(--mango); */
-  --ring: var(--cream);
-
-  --sidebar: #0d1a15;
-  --sidebar-foreground: #f8f0e3;
-  --sidebar-primary: var(--mango);
-  --sidebar-primary-foreground: #12261f;
-  --sidebar-accent: #1d3a30;
-  --sidebar-accent-foreground: #f8f0e3;
-  --sidebar-border: #f8f0e3;
-  --sidebar-ring: var(--mango);
-
-  --pop-shadow: 3px 4px 0 0 #000;
-  --pop-shadow-sm: 2px 3px 0 0 #000;
+  --sidebar: #11181f;
+  --sidebar-foreground: #c9d3df;
+  --sidebar-primary: #6aa3f5;
+  --sidebar-primary-foreground: #0b1626;
+  --sidebar-accent: #1b2430;
+  --sidebar-accent-foreground: #e6ebf2;
+  --sidebar-border: #2a3542;
+  --sidebar-ring: #6aa3f5;
 }
 
 @theme inline {
@@ -133,11 +128,20 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-soft: var(--destructive-soft);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-slab: var(--slab);
+  --color-slab-foreground: var(--slab-foreground);
+  --color-slab-muted: var(--slab-muted);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -152,117 +156,69 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Raw brand colors, usable as bg-mango, text-tomato, etc. */
-  --color-cream: var(--cream);
-  --color-paper: var(--paper);
-  --color-ink: var(--ink);
-  --color-mango: var(--mango);
-  --color-tomato: var(--tomato);
-  --color-leaf: var(--leaf);
-  --color-stone: var(--stone);
-
-  --radius-sm: calc(var(--radius) - 6px);
-  --radius-md: calc(var(--radius) - 3px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 6px);
-  --radius-2xl: calc(var(--radius) + 12px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-4xl: calc(var(--radius) + 14px);
 
-  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
-
-  --shadow-pop: var(--pop-shadow);
-  --shadow-pop-sm: var(--pop-shadow-sm);
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/10;
+    @apply border-border outline-ring/40;
   }
-
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    letter-spacing: var(--tracking-normal);
   }
-
-  /* Headings use the soft, chunky serif */
   h1,
   h2,
   h3,
   h4 {
-    @apply font-display font-black tracking-tight;
-  }
-
-  /* Poster-style accent word: <em class="not-italic">…</em> or <span class="accent-word"> */
-  .accent-word {
-    @apply font-display italic font-bold text-accent;
+    @apply font-semibold tracking-tight;
   }
 }
 
 @layer components {
-  /* Optional helpers if you want the pop look outside shadcn components */
-  .pop {
-    @apply border-2 border-ink shadow-pop;
-  }
-  .pop-press {
-    @apply transition-all active:translate-x-0.5 active:translate-y-0.75 active:shadow-none;
+  /* amounts and codes: aligned digits, slashed zero */
+  .figure {
+    @apply font-mono tabular-nums;
   }
 
-  .pop-btn {
-    @apply border-ink shadow-pop-sm active:translate-x-0.5 active:translate-y-1.5 active:shadow-none;
-  }
-}
-
-/* Sonner toast customizations to match design system */
-@layer components {
-  /* Toast progress bar - match toast variant colors */
   [data-sonner-toast] [data-sonner-progress] {
     background: currentColor;
   }
-
-  /* Success toast progress */
   [data-sonner-toast][data-type="success"] [data-sonner-progress] {
     background: var(--success);
   }
-
-  /* Error toast progress */
   [data-sonner-toast][data-type="error"] [data-sonner-progress] {
     background: var(--destructive);
   }
-
-  /* Warning toast progress */
   [data-sonner-toast][data-type="warning"] [data-sonner-progress] {
+    background: var(--warning);
+  }
+  [data-sonner-toast][data-type="info"] [data-sonner-progress] {
     background: var(--primary);
   }
-
-  /* Info toast progress */
-  [data-sonner-toast][data-type="info"] [data-sonner-progress] {
-    background: var(--secondary);
-  }
-
-  /* Loading toast progress */
   [data-sonner-toast][data-type="loading"] [data-sonner-progress] {
     background: var(--muted-foreground);
   }
-
-  /* Close button hover state */
   [data-sonner-toast] [data-sonner-close-button]:hover {
     background: var(--muted);
     color: var(--muted-foreground);
   }
+}
 
-  /* Action button styling */
-  [data-sonner-toast] [data-sonner-action] {
-    @apply border-2 border-ink shadow-pop-sm active:translate-x-0.5 active:translate-y-0.75 active:shadow-none transition-all;
-  }
-
-  /* Ensure toaster container uses proper z-index */
-  .toaster {
-    z-index: 9999;
-  }
-
-  /* Toast enter/exit animations match the design */
-  [data-sonner-toast] {
-    @apply border-2 shadow-pop;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

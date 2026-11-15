@@ -130,7 +130,7 @@ export function TillPaymentsView() {
   const t = day?.totals;
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-6">
+    <div className="mx-auto grid max-w-7xl gap-6">
       <PageHeader
         title="Till payments"
         description="Payments customers made straight to the till, and what happened to each one."

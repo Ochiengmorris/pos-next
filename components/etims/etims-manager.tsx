@@ -152,7 +152,7 @@ export function EtimsManager({
               <SelectTrigger id="mock-mode" className="h-11 min-w-fit bg-card">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className={"rounded-xl p-2 min-w-fit"}>
+              <SelectContent className={"rounded-xl p-1 min-w-fit"}>
                 {mock.modes.map((m) => (
                   <SelectItem key={m} value={m}>
                     {MODE_LABELS[m] ?? m}

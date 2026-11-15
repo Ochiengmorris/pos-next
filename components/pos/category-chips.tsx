@@ -30,7 +30,7 @@ export function CategoryChips({
           variant={value === c.id ? "default" : "outline"}
           aria-pressed={value === c.id}
           onClick={() => onChange(c.id)}
-          className="h-11 shrink-0 rounded-full px-5"
+          className="h-11 shrink-0 rounded-full px-4"
         >
           {c.name}
         </Button>

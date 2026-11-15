@@ -5,11 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const TONES = {
-  teal: { card: "border-teal-100 bg-teal-50", icon: "text-teal-700" },
-  blue: { card: "border-blue-100 bg-blue-50", icon: "text-blue-700" },
-  amber: { card: "border-amber-100 bg-amber-50", icon: "text-amber-700" },
-  red: { card: "border-red-100 bg-red-50", icon: "text-red-700" },
-  violet: { card: "border-violet-100 bg-violet-50", icon: "text-violet-700" },
+  teal: { icon: "bg-success-soft text-success" },
+  blue: { icon: "bg-accent text-accent-foreground" },
+  amber: { icon: "bg-warning-soft text-warning" },
+  red: { icon: "bg-destructive-soft text-destructive" },
+  violet: { icon: "bg-secondary text-secondary-foreground" },
 } as const;
 
 export function KpiCard({
@@ -27,22 +27,17 @@ export function KpiCard({
 }) {
   const t = TONES[tone];
   return (
-    <Card className={cn("gap-0 py-5", t.card)}>
+    <Card className="gap-0 py-5">
       <CardContent className="grid gap-3 px-5">
-        <div className="flex items-center gap-2 text-sm font-medium">
+        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <span
-            className={cn(
-              "grid size-8 place-items-center rounded-lg bg-white",
-              t.icon,
-            )}
+            className={cn("grid size-8 place-items-center rounded-lg", t.icon)}
           >
             <Icon className="size-4" aria-hidden />
           </span>
           {label}
         </div>
-        <p className="text-3xl font-semibold tabular-nums tracking-tight">
-          {value}
-        </p>
+        <p className="figure text-3xl font-semibold tracking-tight">{value}</p>
         <div className="grid gap-0.5 text-sm text-muted-foreground">
           {children}
         </div>

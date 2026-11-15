@@ -239,7 +239,7 @@ function StaffForm({
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className={"p-2 rounded-xl"}>
+            <SelectContent className={"p-1 rounded-xl"}>
               {(Object.keys(ROLE_LABEL) as StaffRole[]).map((r) => (
                 <SelectItem key={r} value={r}>
                   {ROLE_LABEL[r]}
@@ -260,7 +260,6 @@ function StaffForm({
               value={password}
               onChange={setPassword}
               invalid={!!errors.password}
-              
               generate
             />
             <FieldDescription>

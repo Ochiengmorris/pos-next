@@ -27,6 +27,7 @@ import type { Receipt } from "@/lib/pos/types";
 // import type { StoreSettings } from "@/lib/settings/types";
 import { useApi } from "@/lib/use-api";
 import { StoreSettings } from "../../lib/settings/types";
+import { useRouter } from "next/navigation";
 
 const pick = (s: StoreSettings): StoreSettings => ({
   name: s.name,
@@ -40,6 +41,7 @@ export function SettingsForm({ initial }: { initial: StoreSettings }) {
   const call = useApi();
   const [saved, setSaved] = useState(pick(initial));
   const [v, setV] = useState(pick(initial));
+  const router = useRouter();
   const [nameError, setNameError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -67,6 +69,7 @@ export function SettingsForm({ initial }: { initial: StoreSettings }) {
       const next = pick(res);
       setSaved(next);
       setV(next);
+      router.refresh();
       toast.success("Settings saved. New receipts will use them.");
     } catch (err) {
       setServerError(

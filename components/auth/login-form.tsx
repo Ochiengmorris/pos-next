@@ -49,7 +49,7 @@ export function LoginForm({
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
-          <InputGroup className="h-12 border-0 bg-background">
+          <InputGroup className="h-12 bg-background focus-visible:border-ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
             <InputGroupAddon>
               <Mail aria-hidden />
             </InputGroupAddon>

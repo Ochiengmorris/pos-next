@@ -98,7 +98,7 @@ export function MovementsPanel({
           >
             <SelectValue placeholder="All types" />
           </SelectTrigger>
-          <SelectContent className={"rounded-xl p-2 min-w-fit"}>
+          <SelectContent className={"rounded-xl p-1 min-w-fit"}>
             <SelectItem value="all">All types</SelectItem>
             {Object.entries(MOVEMENT_LABEL).map(([value, label]) => (
               <SelectItem key={value} value={value}>

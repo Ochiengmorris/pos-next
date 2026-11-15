@@ -55,7 +55,7 @@ export function UserMenu({ name, email, role }: UserMenuProps) {
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger
           aria-label={`Account menu for ${displayName}`}
-          className="flex max-w-full items-center gap-3 rounded-full p-1.5 pr-2 outline-none transition-colors hover:bg-accent group focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=open]:bg-accent"
+          className="flex max-w-full items-center gap-3 rounded-full p-1.5 pr-2 outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40 data-[state=open]:bg-muted"
         >
           <span
             aria-hidden
@@ -63,11 +63,11 @@ export function UserMenu({ name, email, role }: UserMenuProps) {
           >
             {getInitials(displayName)}
           </span>
-          <span className="hidden min-w-0 group-hover:font-semibold group-hover:text-muted text-left leading-tight sm:block">
+          <span className="hidden min-w-0 text-left leading-tight sm:block">
             <span className="block truncate text-sm font-semibold">
               {displayName}
             </span>
-            <span className="block truncate text-xs group-hover:text-muted text-muted-foreground">
+            <span className="block truncate text-xs text-muted-foreground">
               {roleLabel}
             </span>
           </span>
@@ -77,7 +77,7 @@ export function UserMenu({ name, email, role }: UserMenuProps) {
           />
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" className="w-60 rounded-xl">
+        <DropdownMenuContent align="end" className="w-60 ">
           <DropdownMenuGroup>
             <DropdownMenuLabel className="font-normal">
               <p className="truncate text-sm font-semibold">{displayName}</p>
