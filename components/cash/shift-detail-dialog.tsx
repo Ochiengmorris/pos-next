@@ -1,7 +1,7 @@
 // components/cash/shift-detail-dialog.tsx
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { CloseShiftDialog } from "@/components/cash/close-shift-dialog";
 import { MovementDialog } from "@/components/cash/movement-dialog";
@@ -48,16 +48,27 @@ function Body({ id, onChanged }: { id: string; onChanged: () => void }) {
   const [moving, setMoving] = useState(false);
   const [closing, setClosing] = useState(false);
 
-  const load = useCallback(async () => {
-    try {
-      setS(await call<ShiftView>(`/cash/shifts/${id}`));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not load the shift");
-    }
-  }, [call, id]);
+  // bump to load the shift again (after a paid-out, or a retry)
+  const [tick, setTick] = useState(0);
+  const reload = () => setTick((t) => t + 1);
+
+  // State is only set inside the promise callbacks, never synchronously in the effect body
   useEffect(() => {
-    void load();
-  }, [load]);
+    let off = false;
+    call<ShiftView>(`/cash/shifts/${id}`)
+      .then((r) => {
+        if (off) return;
+        setS(r);
+        setError(null);
+      })
+      .catch((e) => {
+        if (!off)
+          setError(e instanceof Error ? e.message : "Could not load the shift");
+      });
+    return () => {
+      off = true;
+    };
+  }, [call, id, tick]);
 
   async function acknowledge() {
     setBusy(true);
@@ -233,7 +244,7 @@ function Body({ id, onChanged }: { id: string; onChanged: () => void }) {
         limited={false}
         onClose={() => setMoving(false)}
         onDone={() => {
-          void load();
+          void reload();
           onChanged();
         }}
       />

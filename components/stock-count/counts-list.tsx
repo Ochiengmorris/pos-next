@@ -224,8 +224,16 @@ function StartDialog({
         <Field>
           <FieldLabel>What are you counting?</FieldLabel>
           <Select value={scope} onValueChange={(v) => setScope(v ?? "all")}>
-            <SelectTrigger className="h-11" aria-label="Count scope">
-              <SelectValue />
+            <SelectTrigger
+              className="h-11 bg-background"
+              aria-label="Count scope"
+            >
+              <SelectValue>
+                {scope === "all"
+                  ? "Whole shop"
+                  : (cats.find((c) => c.id === scope)?.name ??
+                    "Select category")}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Whole shop</SelectItem>
