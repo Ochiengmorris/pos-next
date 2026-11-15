@@ -10,6 +10,7 @@ import {
   Receipt,
   Settings,
   ShoppingCart,
+  Smartphone,
   UserCog,
   type LucideIcon,
 } from "lucide-react";
@@ -22,6 +23,7 @@ export const NAV: NavItem[] = [
   { label: "Pos", href: "/pos", icon: ShoppingCart },
   { label: "Transactions", href: "/transactions", icon: Receipt },
   { label: "Cash", href: "/cash", icon: Banknote },
+  { label: "Till payments", href: "/till-payments", icon: Smartphone },
   { label: "My shift", href: "/shift", icon: Clock },
   { label: "Products", href: "/products", icon: Package },
   { label: "Inventory", href: "/inventory", icon: Boxes },

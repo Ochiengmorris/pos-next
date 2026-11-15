@@ -18,6 +18,7 @@ export const ROUTE_ROLES: { prefix: string; roles: Role[] }[] = [
   { prefix: "/stock-count", roles: ["MANAGER"] },
   { prefix: "/etims", roles: ["MANAGER"] },
   { prefix: "/cash", roles: ["MANAGER"] },
+  { prefix: "/till-payments", roles: ["MANAGER"] },
 ];
 
 export const PUBLIC_PATHS = ["/login", "/session-expired"];

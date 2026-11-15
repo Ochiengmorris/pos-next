@@ -27,8 +27,9 @@ import { useMpesaPayment } from "@/hooks/use-mpesa-payment";
 import { centsToInput, formatKsh, parseCents } from "@/lib/pos/money";
 import type { PaymentEntry } from "@/lib/pos/types";
 import { MpesaPane } from "./mpesa-pane";
+import { TillPayPanel } from "./till-pay-panel";
 
-type Method = "CASH" | "MPESA" | "CARD";
+type Method = "CASH" | "MPESA" | "TILL" | "CARD";
 type Draft = Omit<PaymentEntry, "id">;
 
 /** Flip to true when card payments are ready; the card form below is already wired. */
@@ -40,6 +41,7 @@ const METHOD_META: Record<
 > = {
   CASH: { label: "Cash", icon: Banknote, enabled: true },
   MPESA: { label: "M-Pesa", icon: Smartphone, enabled: true },
+  TILL: { label: "Pay to till", icon: Smartphone, enabled: true },
   CARD: { label: "Card", icon: CreditCard, enabled: CARD_ENABLED },
 };
 
@@ -138,7 +140,7 @@ function AmountDue({
       <p className="text-4xl font-bold tabular-nums sm:text-5xl">
         {formatKsh(Math.max(remaining, 0))}
       </p>
-      {paidCents > 0 && (
+      {/* {paidCents > 0 && (
         <div className="mt-3 grid gap-1.5">
           <div
             className="h-2 overflow-hidden rounded-full bg-background"
@@ -157,7 +159,7 @@ function AmountDue({
             {formatKsh(paidCents)} paid of {formatKsh(totalCents)}
           </p>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
@@ -556,7 +558,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-h-[92dvh] overflow-y-auto sm:max-w-md">
+      <DialogContent className="max-h-[92dvh] max-w-xl overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Payment</DialogTitle>
           <DialogDescription>
@@ -599,17 +601,17 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
             <div
               role="group"
               aria-label="Payment method"
-              className="grid grid-cols-3 gap-2"
+              className="grid grid-cols-2 gap-4 "
             >
               {METHODS.map((m) => {
-                const { label, icon: Icon, enabled } = METHOD_META[m];
+                const { label, enabled } = METHOD_META[m];
                 return (
                   <Button
                     key={m}
                     type="button"
                     variant={method === m ? "secondary" : "outline"}
                     aria-pressed={method === m}
-                    className="h-16 flex-col gap-1 text-xl"
+                    className="h-16 flex gap-1 text-xl"
                     disabled={mpesaBusy || !enabled}
                     onClick={() => {
                       setMethod(m);
@@ -630,6 +632,21 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
 
             {method === "MPESA" ? (
               <MpesaPane mpesa={mpesa} remainingCents={remaining} />
+            ) : method === "TILL" ? (
+              <TillPayPanel
+                amount={centsToInput(remaining)}
+                onPicked={({ transId, amount }) => {
+                  void commit({
+                    id: String(nextId.current++),
+                    method: "MPESA",
+                    amountCents: Math.round(Number(amount) * 100),
+                    reference: transId,
+                    tillTransId: transId,
+                  });
+                  setMethod("CASH");
+                }}
+                onCancel={() => setMethod("CASH")}
+              />
             ) : (
               <form
                 id="payment-form"
@@ -642,19 +659,28 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
                 {method === "CASH" ? (
                   <>
                     <Field>
-                      <FieldLabel htmlFor="cash">
-                        Cash received (KSh)
-                      </FieldLabel>
-                      <Input
-                        id="cash"
-                        ref={cashRef}
-                        inputMode="decimal"
-                        enterKeyHint="done"
-                        autoComplete="off"
-                        className={`${INPUT_CLASS} h-12 text-lg`}
-                        value={cash}
-                        onChange={(e) => setCash(sanitizeMoney(e.target.value))}
-                      />
+                      <FieldLabel htmlFor="cash">Cash received</FieldLabel>
+                      <div className="relative">
+                        <span
+                          aria-hidden
+                          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base font-medium text-muted-foreground"
+                        >
+                          KSh
+                        </span>
+                        <Input
+                          id="cash"
+                          ref={cashRef}
+                          inputMode="decimal"
+                          enterKeyHint="done"
+                          autoComplete="off"
+                          className={`${INPUT_CLASS} h-14 pl-14 text-2xl font-semibold tabular-nums`}
+                          value={cash}
+                          onFocus={(e) => e.currentTarget.select()}
+                          onChange={(e) =>
+                            setCash(sanitizeMoney(e.target.value))
+                          }
+                        />
+                      </div>
                     </Field>
 
                     <div
@@ -784,7 +810,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
               {submitting && <Loader2 className="animate-spin" aria-hidden />}
               {submitting ? "Processing…" : "Complete sale"}
             </Button>
-          ) : method !== "MPESA" ? (
+          ) : method !== "MPESA" && method !== "TILL" ? (
             <Button
               type="submit"
               form="payment-form"
@@ -810,7 +836,7 @@ function PaymentSession({ open, onOpenChange, totalCents, onSubmit }: Props) {
         ) : (
           !draft.entry &&
           method !== "MPESA" &&
-          draft.problem && (
+          method !== "TILL" && (
             <p
               className="text-center text-xs text-muted-foreground"
               role="status"

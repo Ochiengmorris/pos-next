@@ -39,6 +39,7 @@ export type PaymentEntry = {
   tenderedCents?: number; // cash handed over (may exceed the amount)
   reference?: string; // card slip, or the M-Pesa receipt code (display only)
   mpesaPaymentId?: string; // links the sale to the confirmed STK payment
+  tillTransId?: string;
 };
 
 export type EtimsDisplay =
