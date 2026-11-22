@@ -5,7 +5,7 @@ import type { CartLine } from "@/lib/pos/types";
 export function LastScanned({ line }: { line?: CartLine }) {
   if (!line) {
     return (
-      <div className="rounded-xl border border-dashed p-4 text-center text-muted-foreground">
+      <div className="rounded-xl border border-dashed border-border-strong p-4 text-center text-muted-foreground">
         Ready to scan
       </div>
     );
@@ -24,7 +24,7 @@ export function LastScanned({ line }: { line?: CartLine }) {
           {formatKsh(line.priceCents)} × {line.quantity}
         </p>
       </div>
-      <p className="shrink-0 text-3xl font-semibold tabular-nums">
+      <p className="shrink-0 text-3xl font-semibold figure">
         {formatKsh(line.priceCents * line.quantity)}
       </p>
     </div>

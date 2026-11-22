@@ -20,7 +20,13 @@ import { canAccess, type Role } from "@/lib/access";
 import { visibleNav } from "@/lib/nav";
 import { useEtimsAttention } from "@/hooks/use-etims-attention";
 
-export function AppSidebar({ role }: { role: Role }) {
+export function AppSidebar({
+  role,
+  storeName,
+}: {
+  role: Role;
+  storeName?: string;
+}) {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
   const items = visibleNav(role);
@@ -28,7 +34,7 @@ export function AppSidebar({ role }: { role: Role }) {
   return (
     <Sidebar>
       <SidebarHeader className="h-16 justify-center border-b border-sidebar-border px-4">
-        <Logo tone="light" />
+        <Logo tone="light" name={storeName} />
       </SidebarHeader>
 
       <SidebarContent className="p-2">
@@ -51,7 +57,7 @@ export function AppSidebar({ role }: { role: Role }) {
                         />
                       }
                       isActive={active}
-                      className="h-11 gap-3 rounded-lg"
+                      className="h-11 gap-3 rounded-lg text-[15px]"
                     >
                       <Icon aria-hidden />
                       <span>{label}</span>

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 
 import { LoginForm } from "@/components/auth/login-form";
+import { getStoreName } from "../(app)/layout";
 
 export const metadata: Metadata = { title: "Sign in" };
 // Only allow same-site relative redirects
@@ -26,27 +27,15 @@ export default async function LoginPage({
   searchParams: Promise<{ callbackUrl?: string; code?: string }>;
 }) {
   const { callbackUrl, code } = await searchParams;
+  // const storeName = await getStoreName();
 
   return (
-    <main className="min-h-dvh overflow-hidden flex items-center justify-center">
-      {/* Blurred supermarket background */}
-      {/* <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-20 scale-105 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/images/img-1.png')",
-          filter: "blur(6px)",
-        }}
-      /> */}
-
-      {/* Soft overlay keeps the login card readable */}
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-black/65" />
-
+    <main className="flex min-h-dvh items-center justify-center bg-background">
       <div className="flex items-center justify-center px-4 py-10 sm:px-8 w-full">
         <div className="w-full max-w-md">
           {/* the brand panel is hidden below lg, so the logo moves here */}
 
-          <Card className="shadow-md">
+          <Card className="shadow-sm">
             <CardHeader className="flex flex-col items-center relative">
               <Logo className=" justify-center mt-2" />
               {/* <CardTitle

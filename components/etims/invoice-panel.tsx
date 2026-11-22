@@ -171,7 +171,7 @@ export function InvoicesPanel({ initial, summary, isAdmin, onChanged }: Props) {
           >
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className={"p-2 rounded-xl"}>
+          <SelectContent className={"p-1 rounded-xl"}>
             {STATUSES.map(([v, l]) => (
               <SelectItem key={v} value={v}>
                 {l}
@@ -192,7 +192,7 @@ export function InvoicesPanel({ initial, summary, isAdmin, onChanged }: Props) {
           >
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className={"p-2 rounded-xl w-fit"}>
+          <SelectContent className={"p-1 rounded-xl w-fit"}>
             <SelectItem value="all">Sales and credit notes</SelectItem>
             <SelectItem value="SALE">Sales</SelectItem>
             <SelectItem value="CREDIT_NOTE">Credit notes</SelectItem>

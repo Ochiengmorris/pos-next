@@ -189,7 +189,7 @@ export function TransactionsManager({
           >
             <SelectValue placeholder="All statuses" />
           </SelectTrigger>
-          <SelectContent className="rounded-xl p-2 min-w-fit">
+          <SelectContent className="rounded-xl p-1 min-w-fit">
             <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="COMPLETED">Completed</SelectItem>
             <SelectItem value="VOIDED">Voided</SelectItem>

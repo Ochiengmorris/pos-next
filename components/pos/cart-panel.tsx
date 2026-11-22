@@ -117,11 +117,11 @@ export function CartLines({
                 />
               </td>
               {!compact && (
-                <td className="px-2 text-right tabular-nums text-muted-foreground">
+                <td className="px-2 text-right figure text-muted-foreground">
                   {formatKsh(l.priceCents)}
                 </td>
               )}
-              <td className="px-2 text-right font-semibold tabular-nums">
+              <td className="px-2 text-right font-semibold figure">
                 {formatKsh(l.priceCents * l.quantity)}
               </td>
               <td className="px-1 text-right">

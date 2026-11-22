@@ -40,7 +40,7 @@ export function PasswordField() {
   return (
     <Field>
       <FieldLabel htmlFor="password">Password</FieldLabel>
-      <InputGroup className="h-12 bg-background border-0">
+      <InputGroup className="h-12 bg-background focus-visible:border-ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
         <InputGroupAddon>
           <Lock aria-hidden />
         </InputGroupAddon>

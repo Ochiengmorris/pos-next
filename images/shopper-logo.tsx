@@ -1,15 +1,17 @@
 import type { SVGProps } from "react";
 
 /**
- * Shopper smiling-bag icon.
+ * Shopper smiling-bag icon, on the Ledger palette.
  * Usage: <ShopperIcon className="size-8" />
- * Pass `body` / `ink` to recolor (e.g. for dark backgrounds).
+ * Colours follow the theme tokens, so light and dark both work.
+ * Override with `body`, `ink` (outline + handle) or `face` if needed.
  */
 export function ShopperIcon({
-  body = "var(--mango, #FFB93B)",
-  ink = "var(--ink, #12261F)",
+  body = "var(--primary)",
+  ink = "var(--foreground)",
+  face = "var(--primary-foreground)",
   ...props
-}: SVGProps<SVGSVGElement> & { body?: string; ink?: string }) {
+}: SVGProps<SVGSVGElement> & { body?: string; ink?: string; face?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -36,11 +38,11 @@ export function ShopperIcon({
         stroke={ink}
         strokeWidth={4}
       />
-      <circle cx={24.5} cy={38} r={2.8} fill={ink} />
-      <circle cx={39.5} cy={38} r={2.8} fill={ink} />
+      <circle cx={24.5} cy={38} r={2.8} fill={face} />
+      <circle cx={39.5} cy={38} r={2.8} fill={face} />
       <path
         d="M23 46q9 8 18 0"
-        stroke={ink}
+        stroke={face}
         strokeWidth={3.5}
         strokeLinecap="round"
         strokeLinejoin="round"

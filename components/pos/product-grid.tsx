@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { formatKsh, toCents } from "@/lib/pos/money";
 import type { Product } from "@/lib/pos/types";
+import { cn } from "@/lib/utils";
 
 function StockBadge({ p }: { p: Product }) {
   if (p.stockQty <= 0) return <Badge variant="destructive">Out of stock</Badge>;
@@ -19,14 +20,14 @@ function StockBadge({ p }: { p: Product }) {
   return <Badge variant="secondary">{p.stockQty} in stock</Badge>;
 }
 
-const initials = (name: string) =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
+function StockNote({ p }: { p: Product }) {
+  if (p.stockQty <= 0) return <Badge variant="destructive">Out of stock</Badge>;
+  if (p.stockQty <= p.reorderLevel)
+    return <Badge variant="warning">Low: {p.stockQty} left</Badge>;
+  return (
+    <span className="text-xs text-muted-foreground">{p.stockQty} in stock</span>
+  );
+}
 
 function ProductTile({
   p,
@@ -43,23 +44,27 @@ function ProductTile({
       type="button"
       disabled={out}
       onClick={() => onAdd(p)}
-      className="group flex w-full flex-col gap-3 rounded-xl border border-secondary/20 bg-card p-3 text-left shadow-sm transition hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:shadow-sm"
+      className={cn(
+        "relative flex min-h-28 w-full flex-col justify-between gap-3 rounded-lg border bg-card p-3 text-left transition-colors",
+        "hover:border-primary hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+        "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-border disabled:hover:bg-card",
+        inCart > 0 && "border-primary bg-accent",
+      )}
     >
-      <div className="relative grid aspect-4/3 place-items-center rounded-lg bg-muted text-2xl font-semibold text-muted-foreground">
-        {initials(p.name)}
-        {inCart > 0 && (
-          <span className="absolute right-2 top-2 grid min-w-7 place-items-center rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-            {inCart}
-          </span>
-        )}
-      </div>
-      <div>
-        <p className="line-clamp-2 min-h-10 text-sm font-medium">{p.name}</p>
-        <p className="mt-1 text-base font-semibold">
+      <p className="line-clamp-2 pr-8 text-sm font-medium leading-snug">
+        {p.name}
+      </p>
+      <div className="flex items-end justify-between gap-2">
+        <p className="figure text-base font-semibold">
           {formatKsh(toCents(p.price))}
         </p>
+        <StockNote p={p} />
       </div>
-      <StockBadge p={p} />
+      {inCart > 0 && (
+        <span className="figure absolute right-2 top-2 grid min-w-6 place-items-center rounded-md bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
+          {inCart}
+        </span>
+      )}
     </button>
   );
 }
@@ -81,7 +86,7 @@ export function ProductGrid({
     );
   }
   return (
-    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       {products.map((p) => (
         <li key={p.id}>
           <ProductTile p={p} inCart={cartQty[p.id] ?? 0} onAdd={onAdd} />
@@ -131,7 +136,7 @@ export function ProductList({
                     ? `Low: ${p.stockQty} left`
                     : `${p.stockQty} in stock`}
               </span>
-              <span className="w-20 shrink-0 text-right font-semibold tabular-nums">
+              <span className="figure w-24 shrink-0 text-right font-semibold">
                 {formatKsh(toCents(p.price))}
               </span>
             </button>

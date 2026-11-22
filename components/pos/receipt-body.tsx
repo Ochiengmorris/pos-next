@@ -229,8 +229,8 @@ export function ReceiptBody({
       )}
 
       {r.store.footer && <p className="mt-3 text-center">{r.store.footer}</p>}
-      <p className="text-xs text-center text-muted-foreground">
-        Powered by RAVEZAPOS
+      <p className="text-xs text-center text-muted-foreground mt-2">
+        https://umojapos.store
       </p>
     </div>
   );

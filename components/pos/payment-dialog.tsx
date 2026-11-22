@@ -277,7 +277,7 @@ function PinSection({
           spellCheck={false}
           autoFocus
           placeholder="A123456789Z"
-          className={`${INPUT_CLASS} font-mono`}
+          className={`${INPUT_CLASS} h-11 font-mono`}
           aria-invalid={!!problem}
           disabled={disabled}
         />
@@ -290,7 +290,7 @@ function PinSection({
           value={name}
           maxLength={60}
           autoComplete="off"
-          className={INPUT_CLASS}
+          className={`${INPUT_CLASS} h-11`}
           onChange={(e) => onNameChange(e.target.value)}
           disabled={disabled}
         />

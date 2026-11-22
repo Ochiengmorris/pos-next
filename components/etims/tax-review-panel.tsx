@@ -338,7 +338,7 @@ export function TaxReviewPanel({
                           >
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className={"rounded-xl p-2 min-w-fit"}>
+                          <SelectContent className={"rounded-xl p-1 min-w-fit"}>
                             {types.map((t) => (
                               <SelectItem key={t.code} value={t.code}>
                                 {label(t)}

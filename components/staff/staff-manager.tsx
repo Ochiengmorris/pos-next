@@ -97,7 +97,7 @@ function StaffCard({
   return (
     <Card
       className={cn(
-        "flex flex-col transition-all hover:shadow-pop-md",
+        "flex flex-col transition-all ",
         !isActive && "opacity-60 border-destructive/30",
       )}
     >
@@ -377,7 +377,7 @@ export function StaffManager({
           >
             <SelectValue placeholder="All roles" />
           </SelectTrigger>
-          <SelectContent className="p-2 w-fit rounded-xl">
+          <SelectContent className="p-1 w-fit rounded-xl">
             <SelectItem value="all">All roles</SelectItem>
             {(Object.keys(ROLE_LABEL) as StaffRole[]).map((r) => (
               <SelectItem key={r} value={r}>
